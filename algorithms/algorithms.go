@@ -14,14 +14,14 @@ func Fac(n int64) int64 {
 }
 
 // MinInt32 return the value and index of the smallest int in vals.
-// The first return is the value, and the second is the argument.
+// The first return is the value, and the second is the index of that value.
 func MinInt(vals []int) (int, int) {
 	return MinIntAfter(vals, -1)
 }
 
 // MinIntAfter return the value and index of the smallest int in vals
 // after the given starting index.
-// The first return is the value, and the second is the argument.
+// The first return is the value, and the second is the index of that value.
 func MinIntAfter(vals []int, after int) (int, int) {
 	if len(vals) == 0 {
 		return math.MinInt32, -1
