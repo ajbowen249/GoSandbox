@@ -14,10 +14,17 @@ func TestIntLLGet(t *testing.T){
 	for _, c := range cases{
 		ll := new(IntLinkedList)
 		
-		for n := range c.inputs{
-			node := new(IntNode)
-			node.value = n
-			ll.Add(node)
+		for i := range c.inputs{
+			ll.Add(c.inputs[i])
+		}
+		
+		for i := 0; i < len(c.inputs); i++{
+			expected := c.inputs[i]
+			result := ll.Get(i)
+			
+			if expected != result{
+				t.Errorf("Expected Get(%v) == %v, but was %v", i, expected, result)
+			}
 		}
 	}
 }
