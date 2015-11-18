@@ -1,14 +1,19 @@
 package dataStructures
 
-import "testing"
+import 
+(
+"testing"
+)
 
-type intLLGetCase struct{
+type IntLLGetCase struct{
 	inputs []int
 }
 
 func TestIntLLGet(t *testing.T){
-	cases := []intLLGetCase{
+	cases := []IntLLGetCase{
 		{[]int{3, 7, 1, 4}},
+		{[]int{3}},
+		{[]int{3, 7, 1, 4, 9, 4, 0}},
 	}
 	
 	for _, c := range cases{
@@ -29,3 +34,32 @@ func TestIntLLGet(t *testing.T){
 	}
 }
 
+type IntBinaryTreeCase struct{
+	inputs, order []int
+}
+
+func TestIntBinaryTreeVisit(t *testing.T){
+	cases := []IntBinaryTreeCase{
+		{[]int{3, 7, 1, 4}, []int{1, 3, 4, 7}},
+		{[]int{2}, []int{2}},
+		{[]int{50, 0, -3, 1, -10, 19}, []int{-10, -3, 0, 1, 19, 50}},
+	}
+	
+	for _, c := range cases{
+		tree := new(IntBinaryTree)
+		
+		for i := range c.inputs{
+			tree.Add(c.inputs[i])
+		}
+		
+		index := 0
+		
+		tree.VisitAscending(func(node *IntBinaryNode){
+			if node.value != c.order[index]{
+				t.Errorf("Expected tree[%v] == %v, but was %v", index, c.order[index], node.value)
+			}
+			
+			index++
+		})
+	}
+}

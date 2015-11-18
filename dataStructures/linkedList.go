@@ -5,18 +5,18 @@ import(
 )
 
 type IntLinkedList struct{
-	head *IntNode
-	tail *IntNode
+	head *IntLLNode
+	tail *IntLLNode
 }
 
-type IntNode struct{
+type IntLLNode struct{
 	value int
-	previous *IntNode
-	next *IntNode
+	previous *IntLLNode
+	next *IntLLNode
 }
 
 func (ll *IntLinkedList) Add(newValue int) {
-	newNode := new(IntNode)
+	newNode := new(IntLLNode)
 	newNode.value = newValue
 	
 	if ll.head == nil{
@@ -47,7 +47,6 @@ func (ll *IntLinkedList) Get(index int) int{
 
 func (ll *IntLinkedList) Print(){
 	current := ll.head
-	fmt.Println("traverse")
 	for current != nil{
 		fmt.Println(current.value)
 		current = current.next
