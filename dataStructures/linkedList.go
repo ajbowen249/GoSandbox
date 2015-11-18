@@ -5,50 +5,50 @@ import(
 )
 
 type IntLinkedList struct{
-	head *IntLLNode
-	tail *IntLLNode
+	Head *IntLLNode
+	Tail *IntLLNode
 }
 
 type IntLLNode struct{
-	value int
-	previous *IntLLNode
-	next *IntLLNode
+	Value int
+	Previous *IntLLNode
+	Next *IntLLNode
 }
 
 func (ll *IntLinkedList) Add(newValue int) {
 	newNode := new(IntLLNode)
-	newNode.value = newValue
+	newNode.Value = newValue
 	
-	if ll.head == nil{
-		ll.head = newNode
-		ll.tail = newNode
+	if ll.Head == nil{
+		ll.Head = newNode
+		ll.Tail = newNode
 		return
 	}
 	
-	ll.tail.next = newNode
-	newNode.previous = ll.tail
-	ll.tail = newNode
+	ll.Tail.Next = newNode
+	newNode.Previous = ll.Tail
+	ll.Tail = newNode
 }
 
 func (ll *IntLinkedList) Get(index int) int{
-	current := ll.head
+	current := ll.Head
 	
 	for index > 0 {
 		if current == nil{
 			return 0
 		}
 		
-		current = current.next
+		current = current.Next
 		index--
 	}
 	
-	return current.value
+	return current.Value
 }
 
 func (ll *IntLinkedList) Print(){
-	current := ll.head
+	current := ll.Head
 	for current != nil{
-		fmt.Println(current.value)
-		current = current.next
+		fmt.Println(current.Value)
+		current = current.Next
 	}
 }

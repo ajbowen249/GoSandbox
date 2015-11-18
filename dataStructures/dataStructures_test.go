@@ -55,8 +55,8 @@ func TestIntBinaryTreeVisit(t *testing.T){
 		index := 0
 		
 		tree.VisitAscending(func(node *IntBinaryNode){
-			if node.value != c.order[index]{
-				t.Errorf("Expected tree[%v] == %v, but was %v", index, c.order[index], node.value)
+			if node.Value != c.order[index]{
+				t.Errorf("Expected tree[%v] == %v, but was %v", index, c.order[index], node.Value)
 			}
 			
 			index++

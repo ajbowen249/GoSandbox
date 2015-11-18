@@ -1,8 +1,8 @@
 package dataStructures
 
 type IntBinaryNode struct{
-	value int
-	left, right *IntBinaryNode
+	Value int
+	Left, Right *IntBinaryNode
 }
 
 type IntBinaryTree struct{
@@ -11,7 +11,7 @@ type IntBinaryTree struct{
 
 func (tree *IntBinaryTree) Add(val int){
 	newNode := new(IntBinaryNode)
-	newNode.value = val
+	newNode.Value = val
 	
 	if tree.head == nil{
 		tree.head = newNode
@@ -21,19 +21,19 @@ func (tree *IntBinaryTree) Add(val int){
 	point := tree.head
 	
 	for {
-		if newNode.value < point.value{
-			if point.left == nil{
-				point.left = newNode
+		if newNode.Value < point.Value{
+			if point.Left == nil{
+				point.Left = newNode
 				break
 			}else{
-				point = point.left
+				point = point.Left
 			}
 		}else{
-			if point.right == nil{
-				point.right = newNode
+			if point.Right == nil{
+				point.Right = newNode
 				break
 			}else{
-				point = point.right
+				point = point.Right
 			}
 		}
 	}
@@ -48,7 +48,7 @@ func visitAscending_rec(node *IntBinaryNode, visit func(node *IntBinaryNode)){
 		return
 	}
 	
-	visitAscending_rec(node.left, visit)
+	visitAscending_rec(node.Left, visit)
 	visit(node)
-	visitAscending_rec(node.right, visit)
+	visitAscending_rec(node.Right, visit)
 }
