@@ -17,6 +17,7 @@ const(
 	CENTERRIGHTBIAS
 )
 
+// New returns an initialized Table struct
 func New() *Table{
 	tb := new(Table)
 	tb.data = make(map[string]map[int]string)
@@ -27,12 +28,15 @@ func New() *Table{
 	return tb
 }
 
+// AddColumn adds a new column to the table. 
+// No default values are added to the column.
 func (tb *Table) AddColumn(name string){
 	tb.columns = append(tb.columns, name)
 	tb.data[name] = make(map[int]string)
 }
 
-
+// AddRow takes a set of strings values
+// for each column of the new row.
 func (tb *Table) AddRow(values ...string){
 	for i := 0; i < len(values); i++{
 		tb.data[tb.columns[i]][tb.numRows] = values[i]
@@ -41,6 +45,8 @@ func (tb *Table) AddRow(values ...string){
 	tb.numRows++
 }
 
+// Output executes the given func for each display
+// row of the table
 func (tb *Table) Output(outFunc func(string)){
 	outData := make([][]string, len(tb.columns))
 	
