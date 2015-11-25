@@ -85,6 +85,8 @@ func tableTest(){
 	tb.AddColumn("Y")
 	tb.AddColumn("X + Y")
 	
+	rand.Seed(time.Now().UnixNano())
+	
 	for i := 0; i < 15; i++{
 		x := rand.Int()
 		y := rand.Int()
