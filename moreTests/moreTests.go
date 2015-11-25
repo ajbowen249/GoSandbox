@@ -5,42 +5,52 @@ import(
 "math/rand"
 "time"
 "os"
-"strconv"
 ds "github.com/ajbowen249/GoSandbox/dataStructures"
 al "github.com/ajbowen249/GoSandbox/algorithms"
 "github.com/ajbowen249/GoSandbox/table"
 )
 
 func main(){
-	/*
+	
 	writeHeader()
-
-	for i := 0; i <= 200000; i += 1000{
-		fmt.Println("sorting", i, "integers")
+	tb := startTable()
+	
+	for i := 0; i <= 18000; i += 1000{
+		//fmt.Println("sorting", i, "integers")
 		selection, binary := test(i)
+		updateTable(tb, i, selection, binary)
 		updateFile(i, selection, binary)
 	}
-	*/
 	
-	tableTest()
+	tb.Output(func (row string) { fmt.Println(row)})
+}
+
+func startTable() *table.Table{
+	tb := table.New()
+	tb.AddColumn("NumItems")
+	tb.AddColumn("Selection Sort Time (ms)")
+	tb.AddColumn("Binary Sort Time (ms)")
+	
+	return tb
 }
 
 func test(length int) (time.Duration, time.Duration){
 	input := make([]int, length)
 	
+	rand.Seed(time.Now().UnixNano())
 	for i := range input{
 		input[i] = rand.Int()
 	}
 	
-	fmt.Println("Starting selection sort...")
+	//fmt.Println("Starting selection sort...")
 	selectSortStart := time.Now()
 	
 	al.SortInt(input)
 	selectSortDuration := time.Since(selectSortStart)
 	
-	fmt.Println("select sort took", selectSortDuration)
+	//fmt.Println("select sort took", selectSortDuration)
 	
-	fmt.Println("Starting binary tree sort...")
+	//fmt.Println("Starting binary tree sort...")
 	treeSortStart := time.Now()
 	resultBuffer := make([]int, length)
 	index := 0
@@ -58,7 +68,7 @@ func test(length int) (time.Duration, time.Duration){
 	
 	treeSortDuration := time.Since(treeSortStart)
 	
-	fmt.Println("tree sort took", treeSortDuration)
+	//fmt.Println("tree sort took", treeSortDuration)
 	return selectSortDuration, treeSortDuration
 }
 
@@ -77,23 +87,6 @@ func updateFile(numItems int, selection time.Duration, binary time.Duration){
 	f.WriteString(output)
 }
 
-func tableTest(){
-	tb := table.New()
-	tb.HeaderAlign = table.CENTERLEFTBIAS
-	tb.CellAlign = table.RIGHT
-	tb.AddColumn("X")
-	tb.AddColumn("Y")
-	tb.AddColumn("X + Y")
-	
-	rand.Seed(time.Now().UnixNano())
-	
-	for i := 0; i < 15; i++{
-		x := rand.Int()
-		y := rand.Int()
-		z := x + y
-		
-		tb.AddRow(strconv.Itoa(x), strconv.Itoa(y), strconv.Itoa(z))
-	}
-	
-	tb.Output(func (row string) { fmt.Println(row)})
+func updateTable(tb *table.Table, numItems int, selection time.Duration, binary time.Duration){
+	tb.AddRow(fmt.Sprintf("%v", numItems), fmt.Sprintf("%.3f", selection.Seconds() * 1000), fmt.Sprintf("%.3f", binary.Seconds() * 1000))
 }
