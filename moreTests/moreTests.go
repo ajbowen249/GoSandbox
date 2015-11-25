@@ -11,12 +11,10 @@ al "github.com/ajbowen249/GoSandbox/algorithms"
 )
 
 func main(){
-	
 	writeHeader()
 	tb := startTable()
 	
 	for i := 0; i <= 18000; i += 1000{
-		//fmt.Println("sorting", i, "integers")
 		selection, binary := test(i)
 		updateTable(tb, i, selection, binary)
 		updateFile(i, selection, binary)
@@ -42,15 +40,11 @@ func test(length int) (time.Duration, time.Duration){
 		input[i] = rand.Int()
 	}
 	
-	//fmt.Println("Starting selection sort...")
 	selectSortStart := time.Now()
 	
 	al.SortInt(input)
 	selectSortDuration := time.Since(selectSortStart)
 	
-	//fmt.Println("select sort took", selectSortDuration)
-	
-	//fmt.Println("Starting binary tree sort...")
 	treeSortStart := time.Now()
 	resultBuffer := make([]int, length)
 	index := 0
@@ -68,7 +62,6 @@ func test(length int) (time.Duration, time.Duration){
 	
 	treeSortDuration := time.Since(treeSortStart)
 	
-	//fmt.Println("tree sort took", treeSortDuration)
 	return selectSortDuration, treeSortDuration
 }
 
