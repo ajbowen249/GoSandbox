@@ -5,11 +5,14 @@ import(
 "math/rand"
 "time"
 "os"
+"strconv"
 ds "github.com/ajbowen249/GoSandbox/dataStructures"
 al "github.com/ajbowen249/GoSandbox/algorithms"
+"github.com/ajbowen249/GoSandbox/table"
 )
 
 func main(){
+	/*
 	writeHeader()
 
 	for i := 0; i <= 200000; i += 1000{
@@ -17,6 +20,9 @@ func main(){
 		selection, binary := test(i)
 		updateFile(i, selection, binary)
 	}
+	*/
+	
+	tableTest()
 }
 
 func test(length int) (time.Duration, time.Duration){
@@ -69,4 +75,23 @@ func updateFile(numItems int, selection time.Duration, binary time.Duration){
 	
 	output := fmt.Sprintf("%v, %v, %v\n", numItems, selection.Seconds() * 1000, binary.Seconds() * 1000)
 	f.WriteString(output)
+}
+
+func tableTest(){
+	tb := table.New()
+	tb.HeaderAlign = table.CENTERLEFTBIAS
+	tb.CellAlign = table.RIGHT
+	tb.AddColumn("X")
+	tb.AddColumn("Y")
+	tb.AddColumn("X + Y")
+	
+	for i := 0; i < 15; i++{
+		x := rand.Int()
+		y := rand.Int()
+		z := x + y
+		
+		tb.AddRow(strconv.Itoa(x), strconv.Itoa(y), strconv.Itoa(z))
+	}
+	
+	tb.Output(func (row string) { fmt.Println(row)})
 }
