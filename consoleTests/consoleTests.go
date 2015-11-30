@@ -8,9 +8,11 @@ import(
 )
 
 func main(){
-	console.ClearScreen()
+	con := console.Default()
+
+	con.ClearScreen()
 	//fmt.Println("Testing moveTo:")
-	console.MoveTo(10, 10)
+	con.MoveTo(10, 10)
 	fmt.Print("here")
 	
 	input := bufio.NewScanner(os.Stdin)

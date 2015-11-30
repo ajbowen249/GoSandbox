@@ -4,7 +4,6 @@ package console
 
 // #include <stdio.h>
 // #include <windows.h>
-// #include <conio.h>
 //
 // void MoveTo(SHORT row, SHORT column)
 // {
@@ -16,17 +15,31 @@ package console
 import "C"
 import "fmt"
 
+type Console struct{
+	NumCols, NumRows int
+}
+
+func Default() *Console{
+	con := new(Console)
+	con.NumCols = 80
+	con.NumRows = 25
+	
+	return con
+}
+
 // MoveTo sets the console cursor postition
-func MoveTo(row int, column int){
+func (con *Console) MoveTo(row int, column int){
 	C.MoveTo(C.short(row), C.short(column))
 }
 
-func ClearScreen(){
-	MoveTo(0, 0)
+func (con *Console) ClearScreen(){
+	numChars := con.NumCols * con.NumRows
 	
-	for i :=0; i < 2000; i++{
+	con.MoveTo(0, 0)
+	
+	for i :=0; i < numChars; i++{
 		fmt.Print(" ")
 	}
 	
-	MoveTo(0, 0)
+	con.MoveTo(0, 0)
 }
