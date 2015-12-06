@@ -40,8 +40,8 @@ func Default() *Console{
 }
 
 // MoveTo sets the console cursor postition
-func (con *Console) MoveTo(row int, column int){
-	C.MoveTo(C.short(row), C.short(column))
+func (con *Console) MoveTo(column int, row int){
+	C.MoveTo(C.short(column), C.short(row))
 }
 
 // ClearScreen blanks out the console window 
