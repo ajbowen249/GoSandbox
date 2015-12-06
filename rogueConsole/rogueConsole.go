@@ -4,7 +4,7 @@ type RogueConsole struct{
 	EnvWidth, EnvHeight, CameraWidth, CameraHeight, CameraX, CameraY int
 	
 	bgLayers, fgLayers [][][]rune
-	spriteLayer [][]rune
+	sprites []*Sprite
 }
 
 func NewRogueConsole(envWidth int, envHeight int, cameraWidth int, cameraHeight int) *RogueConsole{
@@ -14,7 +14,6 @@ func NewRogueConsole(envWidth int, envHeight int, cameraWidth int, cameraHeight 
 	con.EnvHeight = envHeight
 	con.CameraWidth = cameraWidth
 	con.CameraHeight = cameraHeight
-	con.spriteLayer = fillArray(envWidth, envHeight, ' ')
 	
 	return con
 }
@@ -27,8 +26,8 @@ func (con *RogueConsole)AddForegroundS(layer string){
 	con.fgLayers = append(con.fgLayers, stringToArray(con.EnvWidth, con.EnvHeight, layer))
 }
 
-func (con *RogueConsole)AddSprite(x int, y int, sp *Sprite){
-	mergeArrays(x, y, sp.GetArray(), &con.spriteLayer)
+func (con *RogueConsole)RegisterSprite(sp *Sprite){
+	con.sprites = append(con.sprites, sp)
 }
 
 func (con *RogueConsole)GetFrameArray() [][]rune{
@@ -38,7 +37,12 @@ func (con *RogueConsole)GetFrameArray() [][]rune{
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.bgLayers[i], &frame)
 	}
 	
-	grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.spriteLayer, &frame)
+	spriteLayer := fillArray(con.EnvWidth, con.EnvHeight, ' ')
+	for i := 0; i < len(con.sprites); i++{
+		mergeArrays(con.sprites[i].X, con.sprites[i].Y, con.sprites[i].GetArray(), &spriteLayer)
+	}
+	
+	grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &spriteLayer, &frame)
 	
 	for i := 0; i < len(con.fgLayers); i++{
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.fgLayers[i], &frame)

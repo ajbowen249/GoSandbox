@@ -1,7 +1,7 @@
 package rogueConsole
 
 type Sprite struct{
-	Width, Height int
+	Width, Height, X, Y int
 	str string
 	
 	array [][]rune

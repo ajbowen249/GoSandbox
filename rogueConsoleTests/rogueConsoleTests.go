@@ -13,6 +13,17 @@ func main(){
 	vCon.ClearScreen()
 	draw(rCon, vCon)
 	
+	sprite := new(rc.Sprite)
+	sprite.Width = 2
+	sprite.Height = 2
+	sprite.X = 4
+	sprite.Y = 3
+	sprite.SetString( 
+		"SS" +
+		"S ")
+		
+	rCon.RegisterSprite(sprite)
+	
 	for{
 		isHit, char := vCon.GetKey()
 		if isHit{
@@ -20,15 +31,24 @@ func main(){
 			char = strings.ToLower(char)
 			switch char{
 				case "w":
-					rCon.CameraY--
+					if rCon.CameraY > 0{
+						rCon.CameraY--
+					}
 				case "a":
-					rCon.CameraX--
+					if rCon.CameraX > 0{
+						rCon.CameraX--
+					}
 				case "s":
-					rCon.CameraY++
+					if rCon.CameraY < rCon.EnvHeight - rCon.CameraHeight{
+						rCon.CameraY++
+					}
 				case "d":
-					rCon.CameraX++
+					if rCon.CameraX < rCon.EnvWidth - rCon.CameraWidth{
+						rCon.CameraX++
+					}
 			}
 			
+			sprite.X = (sprite.X + 1) % (rCon.EnvWidth - sprite.Width)
 			draw(rCon, vCon)
 			vCon.MoveTo(vCon.NumCols - 1, vCon.NumRows - 1)
 		}
@@ -86,15 +106,6 @@ func setup() *rc.RogueConsole{
 	con.AddBackgroundS(bg2)
 	con.AddForegroundS(fg1)
 	con.AddForegroundS(fg2)
-	
-	sprite := new(rc.Sprite)
-	sprite.Width = 2
-	sprite.Height = 2
-	sprite.SetString( 
-		"SS" +
-		"S ")
-		
-	con.AddSprite(4, 3, sprite)
 	
 	con.CameraX = 0
 	con.CameraY = 0

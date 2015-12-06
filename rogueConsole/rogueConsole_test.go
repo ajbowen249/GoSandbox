@@ -60,11 +60,13 @@ func TestConsole1(t *testing.T){
 	sprite := new(Sprite)
 	sprite.Width = 2
 	sprite.Height = 2
+	sprite.X = 4
+	sprite.Y = 3
 	sprite.SetString( 
 		"SS" +
 		"S ")
 		
-	con.AddSprite(4, 3, sprite)
+	con.RegisterSprite(sprite)
 	
 	con.CameraX = 0
 	con.CameraY = 0
