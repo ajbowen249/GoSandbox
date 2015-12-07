@@ -2,19 +2,42 @@ package main
 
 import(
 "fmt"
+"strings"
 "github.com/ajbowen249/GoSandbox/console"
-"bufio"
-"os"
 )
 
 func main(){
 	con := console.Default()
 
 	con.ClearScreen()
-	//fmt.Println("Testing moveTo:")
-	con.MoveTo(10, 10)
-	fmt.Print("here")
+	x, y := 0, 0
+	con.MoveTo(x, y)
+	sprite := "O"
+	fmt.Print(sprite)
+	con.MoveTo(con.NumCols - 1, con.NumRows - 1)
 	
-	input := bufio.NewScanner(os.Stdin)
-    input.Scan()
+	for{
+		isHit, char := con.GetKey()
+		if isHit{
+			con.MoveTo(x, y)
+			fmt.Print(" ")
+			
+			char = strings.ToLower(char)
+			switch char{
+				case "w":
+					y--
+				case "a":
+					x--
+				case "s":
+					y++
+				case "d":
+					x++
+			}
+			
+			con.MoveTo(x, y)
+			fmt.Print(sprite)
+			
+			con.MoveTo(con.NumCols - 1, con.NumRows - 1)
+		}
+	}
 }
