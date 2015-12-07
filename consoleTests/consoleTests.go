@@ -3,6 +3,8 @@ package main
 import(
 "fmt"
 "github.com/ajbowen249/GoSandbox/console"
+"bufio"
+"os"
 )
 
 func main(){
@@ -13,11 +15,6 @@ func main(){
 	con.MoveTo(10, 10)
 	fmt.Print("here")
 	
-	for{
-		isHit, hit := con.KetKey()
-		
-		if isHit{
-			fmt.Print(hit)
-		}
-	}
+	input := bufio.NewScanner(os.Stdin)
+    input.Scan()
 }
