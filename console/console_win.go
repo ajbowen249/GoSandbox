@@ -24,6 +24,15 @@ package console
 //
 //     return character;
 // }
+//
+// void SetCursorProperties(int fill, int visible)
+// {
+//     CONSOLE_CURSOR_INFO cursorInfo;
+//     cursorInfo.dwSize = (DWORD)fill;
+//     cursorInfo.bVisible = (BOOL)visible;
+//     
+//     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+// }
 import "C"
 import "fmt"
 
@@ -72,4 +81,18 @@ func (con *Console) GetKey() (bool, string){
 	}
 	
 	return isHit, character
+}
+
+// SetCursorProperties sets the visibility of the cursor. 
+// The first argument is the percentage of the cell filled
+// by the cursor, from 1 to 100. The second argument sets 
+// whether the cursor is visible.
+func (con *Console) SetCursorProperties(fillPercent int, isVisible bool){
+	visible := 0
+	if isVisible{ visible = 1}
+	
+	if fillPercent < 1{fillPercent = 1}
+	if fillPercent > 100{fillPercent = 100}
+	
+	C.SetCursorProperties(C.int(fillPercent), C.int(visible))
 }

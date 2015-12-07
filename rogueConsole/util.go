@@ -1,7 +1,7 @@
 package rogueConsole
 
 func stringToArray(width int, height int, str string) [][]rune{
-	array := make([][]rune, width)
+	array := make([][]rune, height)
 	
 	runes := []rune(str)
 	strIndex := 0
@@ -30,7 +30,7 @@ func arrayToString(array [][]rune) string{
 }
 
 func fillArray(width int, height int, character rune) [][]rune{
-	array := make([][]rune, width)
+	array := make([][]rune, height)
 	
 	for row := 0; row < height; row++{
 		array[row] = make([]rune, width)

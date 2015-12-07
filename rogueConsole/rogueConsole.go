@@ -4,7 +4,7 @@ type RogueConsole struct{
 	EnvWidth, EnvHeight, CameraWidth, CameraHeight, CameraX, CameraY int
 	
 	bgLayers, fgLayers [][][]rune
-	sprites []*Sprite
+	sprites [][]*Sprite
 }
 
 func NewRogueConsole(envWidth int, envHeight int, cameraWidth int, cameraHeight int) *RogueConsole{
@@ -26,8 +26,9 @@ func (con *RogueConsole)AddForegroundS(layer string){
 	con.fgLayers = append(con.fgLayers, stringToArray(con.EnvWidth, con.EnvHeight, layer))
 }
 
-func (con *RogueConsole)RegisterSprite(sp *Sprite){
-	con.sprites = append(con.sprites, sp)
+func (con *RogueConsole)RegisterSprite(sp *Sprite, layer int){
+	con.expandSpriteLayers(layer)
+	con.sprites[layer] = append(con.sprites[layer], sp)
 }
 
 func (con *RogueConsole)GetFrameArray() [][]rune{
@@ -38,8 +39,10 @@ func (con *RogueConsole)GetFrameArray() [][]rune{
 	}
 	
 	spriteLayer := fillArray(con.EnvWidth, con.EnvHeight, ' ')
-	for i := 0; i < len(con.sprites); i++{
-		mergeArrays(con.sprites[i].X, con.sprites[i].Y, con.sprites[i].GetArray(), &spriteLayer)
+	for layer := len(con.sprites) - 1; layer >= 0; layer--{
+		for sprite := 0; sprite < len(con.sprites[layer]); sprite++{
+			drawSprite(con.sprites[layer][sprite].X, con.sprites[layer][sprite].Y, con.sprites[layer][sprite].GetArray(), &spriteLayer)
+		}
 	}
 	
 	grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &spriteLayer, &frame)
@@ -67,13 +70,31 @@ func grabWindow(x int, y int, width int, height int, source *[][]rune, destinati
 	}
 }
 
-func mergeArrays(x int, y int, source [][]rune, destination *[][]rune){
+func drawSprite(x int, y int, source [][]rune, destination *[][]rune){
 	for row := 0; row < len(source); row++{
 		for col := 0; col < len(source[0]); col++{
 			character := source[row][col]
-			if character != ' '{
-				(*destination)[row + y][col + x] = character
+			charX := col + x
+			charY := row + y
+			
+			if character != ' ' && 
+				charX >= 0 && 
+				charX < len((*destination)[0]) && 
+				charY >= 0 && 
+				charY < 9{
+				(*destination)[charY][charX] = character
 			}
 		}
+	}
+}
+
+func (con *RogueConsole)expandSpriteLayers(maxIndex int){
+	if len(con.sprites) < maxIndex + 1{
+		buffer := make([][]*Sprite, maxIndex + 1)
+		for i := 0; i < len(con.sprites); i++{
+			buffer[i] = con.sprites[i]
+		}
+		
+		con.sprites = buffer
 	}
 }

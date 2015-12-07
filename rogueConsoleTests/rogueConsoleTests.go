@@ -11,6 +11,7 @@ func main(){
 	rCon := setup()
 	vCon := vc.Default()
 	vCon.ClearScreen()
+	vCon.SetCursorProperties(1, false)
 	draw(rCon, vCon)
 	
 	sprite := new(rc.Sprite)
@@ -22,7 +23,7 @@ func main(){
 		"SS" +
 		"S ")
 		
-	rCon.RegisterSprite(sprite)
+	rCon.RegisterSprite(sprite, 0)
 	
 	for{
 		isHit, char := vCon.GetKey()
@@ -31,32 +32,30 @@ func main(){
 			char = strings.ToLower(char)
 			switch char{
 				case "w":
-					if rCon.CameraY > 0{
-						rCon.CameraY--
+					if sprite.Y > 0{
+						sprite.Y--
 					}
 				case "a":
-					if rCon.CameraX > 0{
-						rCon.CameraX--
+					if sprite.X > 0{
+						sprite.X--
 					}
 				case "s":
-					if rCon.CameraY < rCon.EnvHeight - rCon.CameraHeight{
-						rCon.CameraY++
+					if sprite.Y < rCon.EnvHeight{
+						sprite.Y++
 					}
 				case "d":
-					if rCon.CameraX < rCon.EnvWidth - rCon.CameraWidth{
-						rCon.CameraX++
+					if sprite.X < rCon.EnvWidth{
+						sprite.X++
 					}
 			}
 			
-			sprite.X = (sprite.X + 1) % (rCon.EnvWidth - sprite.Width)
 			draw(rCon, vCon)
-			vCon.MoveTo(vCon.NumCols - 1, vCon.NumRows - 1)
 		}
 	}
 }
 
 func setup() *rc.RogueConsole{
-	con := rc.NewRogueConsole(25, 9, 5, 5)
+	con := rc.NewRogueConsole(25, 9, 25, 9)
 
 	bg1 :=
 		"┌───────────────────────┐" + 
