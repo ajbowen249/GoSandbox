@@ -4,6 +4,7 @@ package console
 
 // #include <stdio.h>
 // #include <windows.h>
+// #include <conio.h>
 //
 // void MoveTo(SHORT row, SHORT column)
 // {
@@ -42,4 +43,17 @@ func (con *Console) ClearScreen(){
 	}
 	
 	con.MoveTo(0, 0)
+}
+
+func (con *Console) KetKey() (bool, int){
+	isHit :=  C.kbhit() == 0
+	
+	var hit int
+	if isHit{
+		hit = C.GoInt(C.getch())
+	} else {
+		hit = 0
+	}
+	
+	return isHit, hit
 }
