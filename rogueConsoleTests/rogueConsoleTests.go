@@ -1,18 +1,15 @@
 package main
 
 import(
-"fmt"
 "strings"
 rc "github.com/ajbowen249/GoSandbox/rogueConsole"
-vc "github.com/ajbowen249/GoSandbox/console"
+"github.com/ajbowen249/GoSandbox/console"
 )
 
 func main(){
 	rCon := setup()
-	vCon := vc.Default()
-	vCon.ClearScreen()
-	vCon.SetCursorProperties(1, false)
-	draw(rCon, vCon)
+	console.SetCursorProperties(1, false)
+	console.ClearScreen(80, 25)
 	
 	sprite := new(rc.Sprite)
 	sprite.Width = 2
@@ -25,8 +22,10 @@ func main(){
 		
 	rCon.RegisterSprite(sprite, 0)
 	
+	rCon.Draw()
+	
 	for{
-		isHit, char := vCon.GetKey()
+		isHit, char := console.GetKey()
 		if isHit{
 			
 			char = strings.ToLower(char)
@@ -49,7 +48,7 @@ func main(){
 					}
 			}
 			
-			draw(rCon, vCon)
+			rCon.Draw()
 		}
 	}
 }
@@ -110,15 +109,4 @@ func setup() *rc.RogueConsole{
 	con.CameraY = 0
 	
 	return con
-}
-
-func draw(rCon *rc.RogueConsole, vCon * vc.Console){
-	frame := rCon.GetFrameArray()
-	
-	for row := 0; row < len(frame); row++{
-		for col:= 0; col < len(frame[row]); col++{
-			vCon.MoveTo(col, row)
-			fmt.Print(string(frame[row][col]))
-		}
-	}
 }

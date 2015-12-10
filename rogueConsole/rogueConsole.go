@@ -1,5 +1,10 @@
 package rogueConsole
 
+import(
+"fmt"
+"github.com/ajbowen249/GoSandbox/console"
+)
+
 type RogueConsole struct{
 	EnvWidth, EnvHeight, CameraWidth, CameraHeight, CameraX, CameraY int
 	
@@ -56,6 +61,17 @@ func (con *RogueConsole)GetFrameArray() [][]rune{
 
 func (con *RogueConsole)GetFrameString() string{
 	return arrayToString(con.GetFrameArray())
+}
+
+func (con *RogueConsole)Draw(){
+	frame := con.GetFrameArray()
+	
+	for row := 0; row < len(frame); row++{
+		for col:= 0; col < len(frame[row]); col++{
+			console.MoveTo(col, row)
+			fmt.Print(string(frame[row][col]))
+		}
+	}
 }
 
 func grabWindow(x int, y int, width int, height int, source *[][]rune, destination *[][]rune){

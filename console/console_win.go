@@ -36,41 +36,29 @@ package console
 import "C"
 import "fmt"
 
-type Console struct{
-	NumCols, NumRows int
-}
-
-// Default returns a Console struct where
-// NumCols == 80 and NumRows == 25
-func Default() *Console{
-	con := Console{80, 25}
-	
-	return &con
-}
-
 // MoveTo sets the console cursor postition
-func (con *Console) MoveTo(column int, row int){
+func MoveTo(column int, row int){
 	C.MoveTo(C.short(column), C.short(row))
 }
 
 // ClearScreen blanks out the console window 
 // and returns the cursor to {0, 0}
-func (con *Console) ClearScreen(){
-	numChars := con.NumCols * con.NumRows
-	con.MoveTo(0, 0)
+func ClearScreen(numCols int, numRows int){
+	numChars := numCols * numRows
+	MoveTo(0, 0)
 	
 	for i :=0; i < numChars; i++{
 		fmt.Print(" ")
 	}
 	
-	con.MoveTo(0, 0)
+	MoveTo(0, 0)
 }
 
 // GetKey returns a bool indicating whether a key
 // was pressed on the keyboard and a string for
 // which character was pressed. It does not block
 // for input.
-func (con *Console) GetKey() (bool, string){
+func GetKey() (bool, string){
 	character := ""
 	isHit := false
 	fromC := C.GetKey()
@@ -87,7 +75,7 @@ func (con *Console) GetKey() (bool, string){
 // The first argument is the percentage of the cell filled
 // by the cursor, from 1 to 100. The second argument sets 
 // whether the cursor is visible.
-func (con *Console) SetCursorProperties(fillPercent int, isVisible bool){
+func SetCursorProperties(fillPercent int, isVisible bool){
 	visible := 0
 	if isVisible{ visible = 1}
 	
