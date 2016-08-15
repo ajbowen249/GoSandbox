@@ -7,19 +7,20 @@ import(
 )
 
 func main(){
-	con := console.Default()
+    numCols := 80
+	numRows := 25
 
-	con.ClearScreen()
+	console.ClearScreen(numCols, numRows)
 	x, y := 0, 0
-	con.MoveTo(x, y)
+	console.MoveTo(x, y)
 	sprite := "O"
 	fmt.Print(sprite)
-	con.MoveTo(con.NumCols - 1, con.NumRows - 1)
+	console.MoveTo(numCols - 1, numRows - 1)
 	
 	for{
-		isHit, char := con.GetKey()
+		isHit, char := console.GetKey()
 		if isHit{
-			con.MoveTo(x, y)
+			console.MoveTo(x, y)
 			fmt.Print(" ")
 			
 			char = strings.ToLower(char)
@@ -34,10 +35,10 @@ func main(){
 					x++
 			}
 			
-			con.MoveTo(x, y)
+			console.MoveTo(x, y)
 			fmt.Print(sprite)
 			
-			con.MoveTo(con.NumCols - 1, con.NumRows - 1)
+			console.MoveTo(numCols - 1, numRows - 1)
 		}
 	}
 }

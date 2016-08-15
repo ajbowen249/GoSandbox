@@ -38,7 +38,7 @@ import "fmt"
 
 // MoveTo sets the console cursor postition
 func MoveTo(column int, row int){
-	C.MoveTo(C.short(column), C.short(row))
+	C.MoveTo(C.SHORT(column), C.SHORT(row))
 }
 
 // ClearScreen blanks out the console window 
