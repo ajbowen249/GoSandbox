@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	initCharAttributes := console.GetCharacterProperties()
+	defer console.SetCharacterProperties(initCharAttributes)
+
 	rCon := setup()
 	console.SetCursorProperties(1, false)
 	console.ClearScreen(80, 25)
@@ -17,9 +20,11 @@ func main() {
 	sprite.Height = 2
 	sprite.X = 4
 	sprite.Y = 3
-	sprite.SetString(
-		"SS" +
-			"S ")
+
+	spriteChars := rc.StringToArray(sprite.Width, sprite.Height, "SSS ")
+	spriteColors := rc.FillArrayI(sprite.Width, sprite.Height, console.ChFgCyan)
+	spriteColors[0][1] = console.ChFgGreen | console.ChBgDarkMagenta
+	sprite.SetGraphics(spriteChars, spriteColors)
 
 	rCon.RegisterSprite(sprite, 0)
 

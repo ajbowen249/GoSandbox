@@ -6,6 +6,8 @@ import (
 	"github.com/ajbowen249/GoSandbox/console"
 )
 
+const defaultCharacterAttributes = console.ChFgWhite | console.ChBgBlack
+
 //RogueConsole wraps up interaction with the system console to draw
 //its given sprites, foregrounds, and backgrounds.
 type RogueConsole struct {
@@ -54,21 +56,22 @@ func (con *RogueConsole) RegisterSprite(sp *Sprite, layer int) {
 //and sprites drawn.
 func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
 	frame := FillArrayR(con.CameraWidth, con.CameraHeight, ' ')
-	frameColors := FillArrayI(con.CameraWidth, con.CameraHeight, console.ChFgWhite|console.ChBgBlack)
-	defaultColors := FillArrayI(con.CameraWidth, con.CameraHeight, console.ChFgWhite|console.ChBgBlack)
+	frameColors := FillArrayI(con.CameraWidth, con.CameraHeight, defaultCharacterAttributes)
 
 	for i := 0; i < len(con.bgLayers); i++ {
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.bgLayers[i], &con.bgColors[i], &frame, &frameColors)
 	}
 
 	spriteLayer := FillArrayR(con.EnvWidth, con.EnvHeight, ' ')
+	spriteColors := FillArrayI(con.EnvWidth, con.EnvHeight, defaultCharacterAttributes)
+
 	for layer := len(con.sprites) - 1; layer >= 0; layer-- {
 		for sprite := 0; sprite < len(con.sprites[layer]); sprite++ {
-			drawSprite(con.sprites[layer][sprite], &spriteLayer)
+			drawSprite(con.sprites[layer][sprite], &spriteLayer, &spriteColors)
 		}
 	}
 
-	grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &spriteLayer, &defaultColors, &frame, &frameColors)
+	grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &spriteLayer, &spriteColors, &frame, &frameColors)
 
 	for i := 0; i < len(con.fgLayers); i++ {
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.fgLayers[i], &con.fgColors[i], &frame, &frameColors)
@@ -111,20 +114,21 @@ func grabWindow(x int, y int, width int, height int, charSource *[][]rune, colSo
 	}
 }
 
-func drawSprite(sprite *Sprite, destination *[][]rune) {
-	source := sprite.GetArray()
-	for row := 0; row < len(source); row++ {
-		for col := 0; col < len(source[0]); col++ {
-			character := source[row][col]
+func drawSprite(sprite *Sprite, charDestination *[][]rune, colDestination *[][]int) {
+	charSource, colSource := sprite.GetGraphics()
+	for row := 0; row < len(charSource); row++ {
+		for col := 0; col < len(charSource[0]); col++ {
+			character := charSource[row][col]
 			charX := col + sprite.X
 			charY := row + sprite.Y
 
 			if character != ' ' &&
 				charX >= 0 &&
-				charX < len((*destination)[0]) &&
+				charX < len((*charDestination)[0]) &&
 				charY >= 0 &&
-				charY < len(*destination) {
-				(*destination)[charY][charX] = character
+				charY < len(*charDestination) {
+				(*charDestination)[charY][charX] = character
+				(*colDestination)[charY][charX] = colSource[row][col]
 			}
 		}
 	}

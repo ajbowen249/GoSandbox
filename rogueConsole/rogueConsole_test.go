@@ -68,9 +68,10 @@ func TestConsole1(t *testing.T) {
 	sprite.Height = 2
 	sprite.X = 4
 	sprite.Y = 3
-	sprite.SetString(
-		"SS" +
-			"S ")
+
+	spriteChars := StringToArray(sprite.Width, sprite.Height, "SSS ")
+	spriteColors := FillArrayI(sprite.Width, sprite.Height, defaultCharacterAttributes)
+	sprite.SetGraphics(spriteChars, spriteColors)
 
 	con.RegisterSprite(sprite, 0)
 
@@ -79,7 +80,7 @@ func TestConsole1(t *testing.T) {
 	sprite2.Height = 1
 	sprite2.X = 1
 	sprite2.Y = 1
-	sprite2.SetString("aaaa")
+	sprite2.SetGraphics([][]rune{[]rune{'a', 'a', 'a', 'a'}}, [][]int{[]int{console.ChFgDarkBlue, defaultCharacterAttributes, defaultCharacterAttributes, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite2, 3)
 
 	sprite3 := new(Sprite)
@@ -87,7 +88,7 @@ func TestConsole1(t *testing.T) {
 	sprite3.Height = 1
 	sprite3.X = 2
 	sprite3.Y = 1
-	sprite3.SetString("bbb")
+	sprite3.SetGraphics([][]rune{[]rune{'b', 'b', 'b'}}, [][]int{[]int{console.ChFgDarkCyan, defaultCharacterAttributes, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite3, 2)
 
 	sprite4 := new(Sprite)
@@ -95,7 +96,7 @@ func TestConsole1(t *testing.T) {
 	sprite4.Height = 1
 	sprite4.X = 3
 	sprite4.Y = 1
-	sprite4.SetString("cc")
+	sprite4.SetGraphics([][]rune{[]rune{'c', 'c'}}, [][]int{[]int{console.ChFgDarkGreen, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite4, 1)
 
 	sprite5 := new(Sprite)
@@ -103,7 +104,7 @@ func TestConsole1(t *testing.T) {
 	sprite5.Height = 1
 	sprite5.X = 4
 	sprite5.Y = 1
-	sprite5.SetString("d")
+	sprite5.SetGraphics([][]rune{[]rune{'d'}}, [][]int{[]int{console.ChFgDarkGrey}})
 	con.RegisterSprite(sprite5, 0)
 
 	con.CameraX = 0
@@ -126,7 +127,7 @@ func TestConsole1(t *testing.T) {
 
 	expectedColors := [][]int{
 		[]int{console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed},
-		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite},
+		[]int{console.ChFgRed, console.ChFgDarkBlue, console.ChFgDarkCyan, console.ChFgDarkGreen, console.ChFgDarkGrey},
 		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgYellow, console.ChFgBlue, console.ChFgGreen},
 		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgYellow, console.ChFgGreen, console.ChFgWhite},
 		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite},
