@@ -59,6 +59,11 @@ func main() {
 func setup() *rc.RogueConsole {
 	con := rc.NewRogueConsole(25, 9, 25, 9)
 
+	redArray := rc.FillArrayI(25, 9, console.ChFgRed)
+	greenArray := rc.FillArrayI(25, 9, console.ChFgGreen)
+	blueArray := rc.FillArrayI(25, 9, console.ChFgBlue)
+	yellowArray := rc.FillArrayI(25, 9, console.ChFgYellow)
+
 	bg1 :=
 		"┌───────────────────────┐" +
 			"│                       │" +
@@ -103,10 +108,10 @@ func setup() *rc.RogueConsole {
 			"                         " +
 			"                         "
 
-	con.AddBackgroundS(bg1)
-	con.AddBackgroundS(bg2)
-	con.AddForegroundS(fg1)
-	con.AddForegroundS(fg2)
+	con.AddBackground(rc.StringToArray(25, 9, bg1), redArray)
+	con.AddBackground(rc.StringToArray(25, 9, bg2), greenArray)
+	con.AddForeground(rc.StringToArray(25, 9, fg1), blueArray)
+	con.AddForeground(rc.StringToArray(25, 9, fg2), yellowArray)
 
 	con.CameraX = 0
 	con.CameraY = 0

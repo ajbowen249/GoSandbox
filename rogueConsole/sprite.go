@@ -28,7 +28,7 @@ func (sp *Sprite) GetString() string {
 //the runes of the sprite.
 func (sp *Sprite) GetArray() [][]rune {
 	if !sp.arraySet {
-		sp.array = stringToArray(sp.Width, sp.Height, sp.str)
+		sp.array = StringToArray(sp.Width, sp.Height, sp.str)
 		sp.arraySet = true
 	}
 

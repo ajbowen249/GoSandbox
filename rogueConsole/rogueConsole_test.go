@@ -2,10 +2,17 @@ package rogueConsole
 
 import (
 	"testing"
+
+	"github.com/ajbowen249/GoSandbox/console"
 )
 
 func TestConsole1(t *testing.T) {
 	con := NewRogueConsole(25, 9, 5, 5)
+
+	redArray := FillArrayI(25, 9, console.ChFgRed)
+	greenArray := FillArrayI(25, 9, console.ChFgGreen)
+	blueArray := FillArrayI(25, 9, console.ChFgBlue)
+	yellowArray := FillArrayI(25, 9, console.ChFgYellow)
 
 	bg1 :=
 		"┌───────────────────────┐" +
@@ -51,10 +58,10 @@ func TestConsole1(t *testing.T) {
 			"                         " +
 			"                         "
 
-	con.AddBackgroundS(bg1)
-	con.AddBackgroundS(bg2)
-	con.AddForegroundS(fg1)
-	con.AddForegroundS(fg2)
+	con.AddBackground(StringToArray(25, 9, bg1), redArray)
+	con.AddBackground(StringToArray(25, 9, bg2), greenArray)
+	con.AddForeground(StringToArray(25, 9, fg1), blueArray)
+	con.AddForeground(StringToArray(25, 9, fg2), yellowArray)
 
 	sprite := new(Sprite)
 	sprite.Width = 2
@@ -102,15 +109,34 @@ func TestConsole1(t *testing.T) {
 	con.CameraX = 0
 	con.CameraY = 0
 
-	expectedBuffer :=
+	actualBuffer, actualColors := con.GetFrameArray()
+
+	expectedString :=
 		"┌────" +
 			"│abcd" +
 			"│ cb\\" +
 			"│ d─S" +
 			"│   S"
 
-	actualBuffer := con.GetFrameString()
-	if actualBuffer != expectedBuffer {
-		t.Errorf("Expected GetFrameString() == \n%v\n but was\n%v", expectedBuffer, actualBuffer)
+	actualString := ArrayToString(actualBuffer)
+
+	if actualString != expectedString {
+		t.Errorf("Expected GetFrameString() == \n%v\n but was\n%v", expectedString, actualString)
+	}
+
+	expectedColors := [][]int{
+		[]int{console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed},
+		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite},
+		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgYellow, console.ChFgBlue, console.ChFgGreen},
+		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgYellow, console.ChFgGreen, console.ChFgWhite},
+		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite},
+	}
+
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 5; j++ {
+			if actualColors[i][j] != expectedColors[i][j] {
+				t.Errorf("Expected colors[%v][%v] == %v, but was %v.", i, j, expectedColors[i][j], actualColors[i][j])
+			}
+		}
 	}
 }
