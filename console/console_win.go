@@ -39,15 +39,20 @@ package console
 //     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)properties);
 // }
 //
-// int GetCharacterProperties()
+// int GetConScreenBufferInfo(CONSOLE_SCREEN_BUFFER_INFO* infoBuffer)
 // {
-//     //TODO: This api call can fail. Not sure what to do about that yet.
-//     CONSOLE_SCREEN_BUFFER_INFO infoBuffer;
-//     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &infoBuffer);
-//     return infoBuffer.wAttributes;
+//     return GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), infoBuffer);
 // }
 import "C"
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
+
+// ScreenBufferInfo contains data about the current console window.
+type ScreenBufferInfo struct {
+	CharacterColor int
+}
 
 // MoveTo sets the console cursor postition
 func MoveTo(column int, row int) {
@@ -112,12 +117,27 @@ func SetCharacterProperties(properties int) {
 	C.SetCharacterProperties(C.int(properties))
 }
 
-// GetCharacterProperties returns the flags currently
-// set for the console character properties. It can be
-// used to save the state of the console before
-// altering it.
-func GetCharacterProperties() int {
-	return int(C.GetCharacterProperties())
+// GetScreenBufferInfo returns data abound the current console window.
+func GetScreenBufferInfo() (bool, ScreenBufferInfo) {
+	infoBuffer := new(C.CONSOLE_SCREEN_BUFFER_INFO)
+	if int(C.GetConScreenBufferInfo(infoBuffer)) != 0 {
+		return true, ScreenBufferInfo{int(infoBuffer.wAttributes)}
+	}
+
+	return false, ScreenBufferInfo{0}
+}
+
+// SetScreenBufferInfo takes a ScreenBufferInfo and sets all the
+// current window's properties to match.
+func SetScreenBufferInfo(info ScreenBufferInfo) {
+	SetCharacterProperties(info.CharacterColor)
+}
+
+// SetTitle sets the title of the console
+func SetTitle(title string) {
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	C.SetConsoleTitle((*C.CHAR)(cTitle))
 }
 
 const (

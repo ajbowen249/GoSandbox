@@ -8,8 +8,10 @@ import (
 )
 
 func main() {
-	initCharAttributes := console.GetCharacterProperties()
-	defer console.SetCharacterProperties(initCharAttributes)
+	gotAttrs, initAttrs := console.GetScreenBufferInfo()
+	if gotAttrs {
+		defer console.SetScreenBufferInfo(initAttrs)
+	}
 
 	rCon := setup()
 	console.SetCursorProperties(1, false)

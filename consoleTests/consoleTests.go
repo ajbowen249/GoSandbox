@@ -11,13 +11,14 @@ func main() {
 	numCols := 80
 	numRows := 25
 
+	console.SetTitle("lol I set the title too")
 	console.ClearScreen(numCols, numRows)
 	x, y := 0, 0
 	console.MoveTo(x, y)
 	sprite := "O"
 	fmt.Print(sprite)
 	console.MoveTo(numCols-1, numRows-1)
-	defaultConsoleProperties := console.GetCharacterProperties()
+	_, info := console.GetScreenBufferInfo()
 
 	for {
 		isHit, char := console.GetKey()
@@ -41,7 +42,7 @@ func main() {
 
 			console.SetCharacterProperties(console.ChFgBlue | console.ChBgYellow | console.ChUnderline)
 			fmt.Print(sprite)
-			console.SetCharacterProperties(defaultConsoleProperties)
+			console.SetCharacterProperties(info.CharacterColor)
 
 			console.MoveTo(numCols-1, numRows-1)
 		}
