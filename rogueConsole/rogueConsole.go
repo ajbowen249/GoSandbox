@@ -82,7 +82,8 @@ func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
 
 //Draw outputs the frame buffer to the console.
 func (con *RogueConsole) Draw() {
-	con.Visit(func(r rune, i int) {
+	con.Visit(func(r rune, i int, row int, col int) {
+		console.MoveTo(col, row)
 		console.SetCharacterProperties(i)
 		fmt.Print(string(r))
 	})
@@ -90,13 +91,12 @@ func (con *RogueConsole) Draw() {
 
 // Visit passes each rune in the frame array through the
 // given visitor function
-func (con *RogueConsole) Visit(visit func(rune, int)) {
+func (con *RogueConsole) Visit(visit func(rune, int, int, int)) {
 	frame, frameColors := con.GetFrameArray()
 
 	for row := 0; row < len(frame); row++ {
 		for col := 0; col < len(frame[row]); col++ {
-			console.MoveTo(col, row)
-			visit(frame[row][col], frameColors[row][col])
+			visit(frame[row][col], frameColors[row][col], row, col)
 		}
 	}
 }

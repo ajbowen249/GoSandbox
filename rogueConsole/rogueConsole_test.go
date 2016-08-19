@@ -110,8 +110,6 @@ func TestConsole1(t *testing.T) {
 	con.CameraX = 0
 	con.CameraY = 0
 
-	actualBuffer, actualColors := con.GetFrameArray()
-
 	expectedString :=
 		"┌────" +
 			"│abcd" +
@@ -119,11 +117,7 @@ func TestConsole1(t *testing.T) {
 			"│ d─S" +
 			"│   S"
 
-	actualString := ArrayToString(actualBuffer)
-
-	if actualString != expectedString {
-		t.Errorf("Expected GetFrameString() == \n%v\n but was\n%v", expectedString, actualString)
-	}
+	expectedArray := StringToArray(5, 5, expectedString)
 
 	expectedColors := [][]int{
 		[]int{console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed},
@@ -133,11 +127,13 @@ func TestConsole1(t *testing.T) {
 		[]int{console.ChFgRed, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite},
 	}
 
-	for i := 0; i < 5; i++ {
-		for j := 0; j < 5; j++ {
-			if actualColors[i][j] != expectedColors[i][j] {
-				t.Errorf("Expected colors[%v][%v] == %v, but was %v.", i, j, expectedColors[i][j], actualColors[i][j])
-			}
+	con.Visit(func(r rune, i int, row int, col int) {
+		if r != expectedArray[row][col] {
+			t.Errorf("Expected runes[%v][%v] == %v, but was %v.", row, col, expectedArray[row][col], r)
 		}
-	}
+
+		if i != expectedColors[row][col] {
+			t.Errorf("Expected colors[%v][%v] == %v, but was %v.", row, col, expectedColors[row][col], i)
+		}
+	})
 }
