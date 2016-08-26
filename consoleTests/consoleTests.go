@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/ajbowen249/GoSandbox/console"
 )
@@ -21,21 +20,22 @@ func main() {
 	_, info := console.GetScreenBufferInfo()
 
 	for {
-		isHit, char := console.GetKey()
-		if isHit {
+		isHit, event := console.GetKeyEX()
+		if isHit && event.IsSpecial {
 			console.MoveTo(x, y)
 			fmt.Print(" ")
 
-			char = strings.ToLower(char)
-			switch char {
-			case "w":
+			switch event.SpecialChar {
+			case console.ScArrowUp:
 				y--
-			case "a":
+			case console.ScArrowLeft:
 				x--
-			case "s":
+			case console.ScArrowDown:
 				y++
-			case "d":
+			case console.ScArrowRight:
 				x++
+			case console.ScEsc:
+				return
 			}
 
 			console.MoveTo(x, y)

@@ -54,6 +54,15 @@ type ScreenBufferInfo struct {
 	CharacterColor int
 }
 
+// KeyboardInputInfo contains data about a single keyboard event.
+// It could represent either a character key or a special code.
+// The codes are wrapped up in the Sc* constants in thie package.
+type KeyboardInputInfo struct {
+	IsSpecial   bool
+	Char        rune
+	SpecialChar byte
+}
+
 // MoveTo sets the console cursor postition
 func MoveTo(column int, row int) {
 	C.MoveTo(C.SHORT(column), C.SHORT(row))
@@ -87,6 +96,37 @@ func GetKey() (bool, string) {
 	}
 
 	return isHit, character
+}
+
+// GetKeyEX returns a bool indicating whether a key
+// was pressed on the keyboard and a KeyboardInputInfo
+// for what pressed. It does not block
+// for input.
+func GetKeyEX() (bool, KeyboardInputInfo) {
+	value := KeyboardInputInfo{false, ' ', 0x00}
+
+	fromC := C.GetKey()
+	fromB := byte(fromC)
+
+	if fromB == 0x00 {
+		return false, value
+	}
+
+	if fromB == ScEsc {
+		value.IsSpecial = true
+		value.SpecialChar = ScEsc
+		return true, value
+	}
+
+	if fromB == ScIdentifier {
+		value.IsSpecial = true
+		value.SpecialChar = byte(C.GetKey())
+		return true, value
+	}
+
+	value.Char = rune(fromC)
+
+	return true, value
 }
 
 // SetCursorProperties sets the visibility of the cursor.
@@ -176,4 +216,13 @@ const (
 	ChBgWhite       = C.BACKGROUND_INTENSITY | C.BACKGROUND_RED | C.BACKGROUND_GREEN | C.BACKGROUND_BLUE
 
 	ChUnderline = C.COMMON_LVB_UNDERSCORE
+)
+
+const (
+	ScArrowUp    = 0x48
+	ScArrowLeft  = 0x4B
+	ScArrowRight = 0x4D
+	ScArrowDown  = 0x50
+	ScEsc        = 0x1B
+	ScIdentifier = 0xE0
 )
