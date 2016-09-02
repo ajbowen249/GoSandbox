@@ -1,7 +1,7 @@
 package algorithms
 
 import (
-"math"
+	"math"
 )
 
 // Fac return factorial(n) where n is an int32.
@@ -9,8 +9,8 @@ func Fac(n int64) int64 {
 	if n == 0 {
 		return 1
 	}
-	
-	return n * Fac(n - 1)
+
+	return n * Fac(n-1)
 }
 
 // MinInt32 return the value and index of the smallest int in vals.
@@ -26,17 +26,17 @@ func MinIntAfter(vals []int, after int) (int, int) {
 	if len(vals) == 0 {
 		return math.MinInt32, -1
 	}
-	
-	min := vals[after + 1]
+
+	min := vals[after+1]
 	pos := after + 1
-	
+
 	for i := after + 1; i < len(vals); i++ {
 		if vals[i] < min {
 			min = vals[i]
 			pos = i
 		}
 	}
-	
+
 	return min, pos
 }
 
@@ -47,14 +47,29 @@ func SortInt(vals []int) []int {
 	buf := make([]int, length)
 	copy(buf, vals)
 	index := -1
-	
-	for index < length - 1{
+
+	for index < length-1 {
 		_, pos := MinIntAfter(buf, index)
 		index++
 		temp := buf[index]
 		buf[index] = buf[pos]
 		buf[pos] = temp
 	}
-	
+
 	return buf
+}
+
+// SearchSliceString searches linearly through a slice of string
+// and returns the first index of a value matching the input,
+// or -1.
+func SearchSliceString(strings []string, value string) int {
+	foundIndex := -1
+	for i := 0; i < len(strings); i++ {
+		if strings[i] == value {
+			foundIndex = i
+			break
+		}
+	}
+
+	return foundIndex
 }
