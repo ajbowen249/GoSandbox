@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ajbowen249/GoSandbox/algorithms"
+	rc "github.com/ajbowen249/GoSandbox/rogueConsole"
 )
 
 //Control is any visual element shown in a form.
@@ -14,6 +15,7 @@ type Control interface {
 	Focus() bool
 	Unfocus()
 	Process()
+	InitVisual(*rc.RogueConsole)
 }
 
 //Form is a "screen" of an application that contains
@@ -23,14 +25,16 @@ type Form struct {
 	TabOrder []string
 
 	currentTabIndex int
+	visual          *rc.RogueConsole
 }
 
 //NewForm creates and initializes a form.
-func NewForm() *Form {
+func NewForm(width int, height int) *Form {
 	form := new(Form)
 	form.Controls = make(map[string]Control)
 
 	form.currentTabIndex = -1
+	form.visual = rc.NewRogueConsole(width, height, width, height)
 
 	return form
 }
@@ -86,13 +90,27 @@ func (form *Form) FocusSpecific(controlName string) {
 
 // Process calls the Process method on all controls.
 func (form *Form) Process() {
-	for _, control := range form.Controls {
+	form.forAllControls(func(control Control) {
 		control.Process()
-	}
+	})
+}
+
+// InitiVisual passes the form's visual context to
+// the InitiVisual method of all controls.
+func (form *Form) InitiVisual() {
+	form.forAllControls(func(control Control) {
+		control.InitVisual(form.visual)
+	})
 }
 
 func (form *Form) unfocusCurrentControl() {
 	if form.currentTabIndex != -1 {
 		form.Controls[form.TabOrder[form.currentTabIndex]].Unfocus()
+	}
+}
+
+func (form *Form) forAllControls(action func(Control)) {
+	for _, control := range form.Controls {
+		action(control)
 	}
 }

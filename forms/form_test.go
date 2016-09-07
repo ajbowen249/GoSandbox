@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ajbowen249/GoSandbox/algorithms"
+	rc "github.com/ajbowen249/GoSandbox/rogueConsole"
 )
 
 type TestControl struct {
@@ -13,6 +14,10 @@ type TestControl struct {
 	Focusable bool
 
 	ProcessCallback func(string)
+}
+
+func NewTestControl(name string) *TestControl {
+	return &TestControl{name, false, true, func(string) {}}
 }
 
 func (tc *TestControl) GetName() string {
@@ -34,13 +39,17 @@ func (tc *TestControl) Process() {
 	}
 }
 
+func (tc *TestControl) InitVisual(*rc.RogueConsole) {
+
+}
+
 func TestAutoFocusOrder(t *testing.T) {
-	testForm := NewForm()
+	testForm := NewForm(80, 25)
 	numTestControls := 10
 	testControls := make([]*TestControl, numTestControls)
 
 	for i := 0; i < numTestControls; i++ {
-		testControls[i] = &TestControl{fmt.Sprintf("tc%v", i), false, true, func(string) {}}
+		testControls[i] = NewTestControl(fmt.Sprintf("tc%v", i))
 		testForm.AddControl(testControls[i], true)
 	}
 
@@ -57,10 +66,10 @@ func TestAutoFocusOrder(t *testing.T) {
 }
 
 func TestSpecificFocus(t *testing.T) {
-	testForm := NewForm()
+	testForm := NewForm(80, 25)
 
-	tc1 := &TestControl{"tc1", false, true, func(string) {}}
-	tc2 := &TestControl{"tc2", false, true, func(string) {}}
+	tc1 := NewTestControl("tc1")
+	tc2 := NewTestControl("tc2")
 
 	testForm.AddControl(tc1, true)
 	testForm.AddControl(tc2, true)
@@ -79,12 +88,15 @@ func TestSpecificFocus(t *testing.T) {
 }
 
 func TestUnfocusableItems(t *testing.T) {
-	testForm := NewForm()
+	testForm := NewForm(80, 25)
 
-	tc1 := &TestControl{"tc1", false, true, func(string) {}}
-	tc2 := &TestControl{"tc2", false, false, func(string) {}}
-	tc3 := &TestControl{"tc3", false, false, func(string) {}}
-	tc4 := &TestControl{"tc4", false, true, func(string) {}}
+	tc1 := NewTestControl("tc1")
+	tc2 := NewTestControl("tc2")
+	tc3 := NewTestControl("tc3")
+	tc4 := NewTestControl("tc4")
+
+	tc2.Focusable = false
+	tc3.Focusable = false
 
 	testForm.AddControl(tc1, true)
 	testForm.AddControl(tc2, true)
@@ -115,15 +127,16 @@ func TestUnfocusableItems(t *testing.T) {
 }
 
 func TestProces(t *testing.T) {
-	testForm := NewForm()
+	testForm := NewForm(80, 25)
 
 	numControls := 10
 	var processedControls []string
 
 	for i := 0; i < numControls; i++ {
-		testControl := &TestControl{fmt.Sprintf("tc%v", i), false, true, func(name string) {
+		testControl := NewTestControl(fmt.Sprintf("tc%v", i))
+		testControl.ProcessCallback = func(name string) {
 			processedControls = append(processedControls, name)
-		}}
+		}
 
 		testForm.AddControl(testControl, true)
 	}
