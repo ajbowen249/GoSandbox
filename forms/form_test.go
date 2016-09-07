@@ -3,11 +3,16 @@ package forms
 import (
 	"fmt"
 	"testing"
+
+	"github.com/ajbowen249/GoSandbox/algorithms"
 )
 
 type TestControl struct {
-	Name     string
-	HasFocus bool
+	Name      string
+	HasFocus  bool
+	Focusable bool
+
+	ProcessCallback func(string)
 }
 
 func (tc *TestControl) GetName() string {
@@ -15,12 +20,18 @@ func (tc *TestControl) GetName() string {
 }
 
 func (tc *TestControl) Focus() bool {
-	tc.HasFocus = true
-	return true
+	tc.HasFocus = tc.Focusable
+	return tc.Focusable
 }
 
 func (tc *TestControl) Unfocus() {
 	tc.HasFocus = false
+}
+
+func (tc *TestControl) Process() {
+	if tc.ProcessCallback != nil {
+		tc.ProcessCallback(tc.Name)
+	}
 }
 
 func TestAutoFocusOrder(t *testing.T) {
@@ -29,7 +40,7 @@ func TestAutoFocusOrder(t *testing.T) {
 	testControls := make([]*TestControl, numTestControls)
 
 	for i := 0; i < numTestControls; i++ {
-		testControls[i] = &TestControl{fmt.Sprintf("tc%v", i), false}
+		testControls[i] = &TestControl{fmt.Sprintf("tc%v", i), false, true, func(string) {}}
 		testForm.AddControl(testControls[i], true)
 	}
 
@@ -41,6 +52,89 @@ func TestAutoFocusOrder(t *testing.T) {
 			if testControls[j].HasFocus != expectFocus {
 				t.Errorf("expcted %v HasFocus == %v, but was %v.", testControls[i].GetName(), expectFocus, testControls[i].HasFocus)
 			}
+		}
+	}
+}
+
+func TestSpecificFocus(t *testing.T) {
+	testForm := NewForm()
+
+	tc1 := &TestControl{"tc1", false, true, func(string) {}}
+	tc2 := &TestControl{"tc2", false, true, func(string) {}}
+
+	testForm.AddControl(tc1, true)
+	testForm.AddControl(tc2, true)
+
+	testForm.FocusSpecific("tc2")
+
+	if !tc2.HasFocus {
+		t.Errorf("Expected that tc2 would have focus, and it did not.")
+	}
+
+	testForm.FocusSpecific("tc1")
+
+	if !tc1.HasFocus {
+		t.Errorf("Expected that tc1 would have focus, and it did not.")
+	}
+}
+
+func TestUnfocusableItems(t *testing.T) {
+	testForm := NewForm()
+
+	tc1 := &TestControl{"tc1", false, true, func(string) {}}
+	tc2 := &TestControl{"tc2", false, false, func(string) {}}
+	tc3 := &TestControl{"tc3", false, false, func(string) {}}
+	tc4 := &TestControl{"tc4", false, true, func(string) {}}
+
+	testForm.AddControl(tc1, true)
+	testForm.AddControl(tc2, true)
+	testForm.AddControl(tc3, true)
+	testForm.AddControl(tc4, true)
+
+	testForm.FocusNext()
+
+	failMessage := "Expected that %v would%v have focus."
+
+	if !tc1.HasFocus {
+		t.Errorf(failMessage, "tc1", "")
+	}
+
+	testForm.FocusNext()
+
+	if tc2.HasFocus {
+		t.Errorf(failMessage, "tc2", "n't")
+	}
+
+	if tc3.HasFocus {
+		t.Errorf(failMessage, "tc3", "n't")
+	}
+
+	if !tc4.HasFocus {
+		t.Errorf(failMessage, "tc4", "")
+	}
+}
+
+func TestProces(t *testing.T) {
+	testForm := NewForm()
+
+	numControls := 10
+	var processedControls []string
+
+	for i := 0; i < numControls; i++ {
+		testControl := &TestControl{fmt.Sprintf("tc%v", i), false, true, func(name string) {
+			processedControls = append(processedControls, name)
+		}}
+
+		testForm.AddControl(testControl, true)
+	}
+
+	testForm.Process()
+
+	//Note: process order is not defined
+	for i := 0; i < numControls; i++ {
+		name := fmt.Sprintf("tc%v", i)
+		if algorithms.SearchSliceString(processedControls, name) < 0 {
+			t.Errorf("Did not process %v.", name)
 		}
 	}
 }

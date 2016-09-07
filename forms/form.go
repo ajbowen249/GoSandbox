@@ -13,6 +13,7 @@ type Control interface {
 	GetName() string
 	Focus() bool
 	Unfocus()
+	Process()
 }
 
 //Form is a "screen" of an application that contains
@@ -80,6 +81,13 @@ func (form *Form) FocusSpecific(controlName string) {
 		form.currentTabIndex = algorithms.SearchSliceString(form.TabOrder, controlName)
 	} else {
 		form.currentTabIndex = -1
+	}
+}
+
+// Process calls the Process method on all controls.
+func (form *Form) Process() {
+	for _, control := range form.Controls {
+		control.Process()
 	}
 }
 
