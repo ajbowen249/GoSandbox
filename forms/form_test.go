@@ -33,13 +33,17 @@ func (tc *TestControl) Unfocus() {
 	tc.HasFocus = false
 }
 
-func (tc *TestControl) Process() {
+func (tc *TestControl) Process(frameInfo *FrameInfo) {
 	if tc.ProcessCallback != nil {
 		tc.ProcessCallback(tc.Name)
 	}
 }
 
 func (tc *TestControl) InitVisual(*rc.RogueConsole) {
+
+}
+
+func (tc *TestControl) SetOwner(*Form) {
 
 }
 

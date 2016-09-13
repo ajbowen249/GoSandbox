@@ -8,6 +8,9 @@ import (
 
 const defaultCharacterAttributes = console.ChFgWhite | console.ChBgBlack
 
+//TransparancyChar is the rune that flags a transparency
+const TransparancyChar = rune(0x00)
+
 //RogueConsole wraps up interaction with the system console to draw
 //its given sprites, foregrounds, and backgrounds.
 type RogueConsole struct {
@@ -55,14 +58,14 @@ func (con *RogueConsole) RegisterSprite(sp *Sprite, layer int) {
 //GetFrameArray returns a final buffer with all foregrounds, backgrounds,
 //and sprites drawn.
 func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
-	frame := FillArrayR(con.CameraWidth, con.CameraHeight, ' ')
+	frame := FillArrayR(con.CameraWidth, con.CameraHeight, TransparancyChar)
 	frameColors := FillArrayI(con.CameraWidth, con.CameraHeight, defaultCharacterAttributes)
 
 	for i := 0; i < len(con.bgLayers); i++ {
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.bgLayers[i], &con.bgColors[i], &frame, &frameColors)
 	}
 
-	spriteLayer := FillArrayR(con.EnvWidth, con.EnvHeight, ' ')
+	spriteLayer := FillArrayR(con.EnvWidth, con.EnvHeight, TransparancyChar)
 	spriteColors := FillArrayI(con.EnvWidth, con.EnvHeight, defaultCharacterAttributes)
 
 	for layer := len(con.sprites) - 1; layer >= 0; layer-- {
@@ -76,6 +79,8 @@ func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
 	for i := 0; i < len(con.fgLayers); i++ {
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.fgLayers[i], &con.fgColors[i], &frame, &frameColors)
 	}
+
+	Replace(&frame, TransparancyChar, ' ')
 
 	return frame, frameColors
 }
@@ -106,7 +111,7 @@ func grabWindow(x int, y int, width int, height int, charSource *[][]rune, colSo
 		for col := 0; col < width; col++ {
 			character := (*charSource)[row+y][col+x]
 
-			if character != ' ' {
+			if character != TransparancyChar {
 				(*charDestination)[row][col] = character
 				(*colDestination)[row][col] = (*colSource)[row+y][col+x]
 			}
@@ -122,7 +127,7 @@ func drawSprite(sprite *Sprite, charDestination *[][]rune, colDestination *[][]i
 			charX := col + sprite.X
 			charY := row + sprite.Y
 
-			if character != ' ' &&
+			if character != TransparancyChar &&
 				charX >= 0 &&
 				charX < len((*charDestination)[0]) &&
 				charY >= 0 &&

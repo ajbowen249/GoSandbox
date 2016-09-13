@@ -61,3 +61,15 @@ func FillArrayI(width int, height int, integer int) [][]int {
 
 	return array
 }
+
+// Replace replaces all occurrances of a given rune within a
+// 2D slice of runes with another given rune.
+func Replace(buffer *[][]rune, toReplace rune, replaceWith rune) {
+	for row := 0; row < len(*buffer); row++ {
+		for col := 0; col < len((*buffer)[0]); col++ {
+			if (*buffer)[row][col] == toReplace {
+				(*buffer)[row][col] = replaceWith
+			}
+		}
+	}
+}

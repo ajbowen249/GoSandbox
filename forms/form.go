@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ajbowen249/GoSandbox/algorithms"
+	"github.com/ajbowen249/GoSandbox/console"
 	rc "github.com/ajbowen249/GoSandbox/rogueConsole"
 )
 
@@ -14,8 +15,15 @@ type Control interface {
 	GetName() string
 	Focus() bool
 	Unfocus()
-	Process()
+	Process(*FrameInfo)
 	InitVisual(*rc.RogueConsole)
+	SetOwner(*Form)
+}
+
+// FrameInfo contains pertinent context data for
+// the Process method of the Controls in a form
+type FrameInfo struct {
+	KeyInfo console.KeyboardInputInfo
 }
 
 //Form is a "screen" of an application that contains
@@ -26,6 +34,7 @@ type Form struct {
 
 	currentTabIndex int
 	visual          *rc.RogueConsole
+	isVisualValid   bool
 }
 
 //NewForm creates and initializes a form.
@@ -35,6 +44,7 @@ func NewForm(width int, height int) *Form {
 
 	form.currentTabIndex = -1
 	form.visual = rc.NewRogueConsole(width, height, width, height)
+	form.isVisualValid = false
 
 	return form
 }
@@ -48,6 +58,7 @@ func (form *Form) AddControl(control Control, autoAddTabOrder bool) {
 		panic(fmt.Sprintf("Attempted to add duplicate control (%v)", control.GetName()))
 	}
 
+	control.SetOwner(form)
 	form.Controls[control.GetName()] = control
 	form.TabOrder = append(form.TabOrder, control.GetName())
 }
@@ -90,9 +101,16 @@ func (form *Form) FocusSpecific(controlName string) {
 
 // Process calls the Process method on all controls.
 func (form *Form) Process() {
+	_, keyInfo := console.GetKeyEX()
+	frameInfo := &FrameInfo{keyInfo}
+
 	form.forAllControls(func(control Control) {
-		control.Process()
+		control.Process(frameInfo)
 	})
+
+	if !form.isVisualValid {
+		form.redraw()
+	}
 }
 
 // InitiVisual passes the form's visual context to
@@ -101,6 +119,11 @@ func (form *Form) InitiVisual() {
 	form.forAllControls(func(control Control) {
 		control.InitVisual(form.visual)
 	})
+}
+
+// InvalidateVisual flags the form to be redrawn
+func (form *Form) InvalidateVisual() {
+	form.isVisualValid = false
 }
 
 func (form *Form) unfocusCurrentControl() {
@@ -113,4 +136,9 @@ func (form *Form) forAllControls(action func(Control)) {
 	for _, control := range form.Controls {
 		action(control)
 	}
+}
+
+func (form *Form) redraw() {
+	form.visual.Draw()
+	form.isVisualValid = true
 }

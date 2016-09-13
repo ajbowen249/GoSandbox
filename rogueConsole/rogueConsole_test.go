@@ -14,94 +14,91 @@ func TestConsole1(t *testing.T) {
 	blueArray := FillArrayI(25, 9, console.ChFgBlue)
 	yellowArray := FillArrayI(25, 9, console.ChFgYellow)
 
-	bg1 :=
-		"┌───────────────────────┐" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"└───────────────────────┘"
+	bg1 := StringToArray(25, 9,
+		"┌───────────────────────┐"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"└───────────────────────┘")
 
-	bg2 :=
-		"                         " +
-			"                         " +
-			"  /─\\                    " +
-			"  \\─/                    " +
-			"                         " +
-			"          1234           " +
-			"                         " +
-			"                         " +
-			"                         "
+	bg2 := StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  /─\\                    "+
+			"  \\─/                    "+
+			"                         "+
+			"          1234           "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	fg1 :=
-		"                         " +
-			"                         " +
-			"  ab                     " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         "
+	fg1 := StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  ab                     "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	fg2 :=
-		"                         " +
-			"                         " +
-			"  c                      " +
-			"  d                      " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         "
+	fg2 := StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  c                      "+
+			"  d                      "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	con.AddBackground(StringToArray(25, 9, bg1), redArray)
-	con.AddBackground(StringToArray(25, 9, bg2), greenArray)
-	con.AddForeground(StringToArray(25, 9, fg1), blueArray)
-	con.AddForeground(StringToArray(25, 9, fg2), yellowArray)
+	Replace(&bg1, ' ', TransparancyChar)
+	Replace(&bg2, ' ', TransparancyChar)
+	Replace(&fg1, ' ', TransparancyChar)
+	Replace(&fg2, ' ', TransparancyChar)
+
+	con.AddBackground(bg1, redArray)
+	con.AddBackground(bg2, greenArray)
+	con.AddForeground(fg1, blueArray)
+	con.AddForeground(fg2, yellowArray)
 
 	sprite := new(Sprite)
-	sprite.Width = 2
-	sprite.Height = 2
 	sprite.X = 4
 	sprite.Y = 3
 
-	spriteChars := StringToArray(sprite.Width, sprite.Height, "SSS ")
-	spriteColors := FillArrayI(sprite.Width, sprite.Height, defaultCharacterAttributes)
+	spriteChars := StringToArray(2, 2, "SSS ")
+	Replace(&spriteChars, ' ', TransparancyChar)
+
+	spriteColors := FillArrayI(2, 2, defaultCharacterAttributes)
 	sprite.SetGraphics(spriteChars, spriteColors)
 
 	con.RegisterSprite(sprite, 0)
 
 	sprite2 := new(Sprite)
-	sprite2.Width = 4
-	sprite2.Height = 1
 	sprite2.X = 1
 	sprite2.Y = 1
 	sprite2.SetGraphics([][]rune{[]rune{'a', 'a', 'a', 'a'}}, [][]int{[]int{console.ChFgDarkBlue, defaultCharacterAttributes, defaultCharacterAttributes, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite2, 3)
 
 	sprite3 := new(Sprite)
-	sprite3.Width = 3
-	sprite3.Height = 1
 	sprite3.X = 2
 	sprite3.Y = 1
 	sprite3.SetGraphics([][]rune{[]rune{'b', 'b', 'b'}}, [][]int{[]int{console.ChFgDarkCyan, defaultCharacterAttributes, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite3, 2)
 
 	sprite4 := new(Sprite)
-	sprite4.Width = 2
-	sprite4.Height = 1
 	sprite4.X = 3
 	sprite4.Y = 1
 	sprite4.SetGraphics([][]rune{[]rune{'c', 'c'}}, [][]int{[]int{console.ChFgDarkGreen, defaultCharacterAttributes}})
 	con.RegisterSprite(sprite4, 1)
 
 	sprite5 := new(Sprite)
-	sprite5.Width = 1
-	sprite5.Height = 1
 	sprite5.X = 4
 	sprite5.Y = 1
 	sprite5.SetGraphics([][]rune{[]rune{'d'}}, [][]int{[]int{console.ChFgDarkGrey}})

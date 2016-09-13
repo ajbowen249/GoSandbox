@@ -58,7 +58,7 @@ type ScreenBufferInfo struct {
 // It could represent either a character key or a special code.
 // The codes are wrapped up in the Sc* constants in thie package.
 type KeyboardInputInfo struct {
-	IsSpecial   bool
+	KeyDown, IsSpecial   bool
 	Char        rune
 	SpecialChar byte
 }
@@ -103,7 +103,7 @@ func GetKey() (bool, string) {
 // for what pressed. It does not block
 // for input.
 func GetKeyEX() (bool, KeyboardInputInfo) {
-	value := KeyboardInputInfo{false, ' ', 0x00}
+	value := KeyboardInputInfo{false, false, ' ', 0x00}
 
 	fromC := C.GetKey()
 	fromB := byte(fromC)
@@ -111,6 +111,8 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 	if fromB == 0x00 {
 		return false, value
 	}
+
+    value.KeyDown = true
 
 	if fromB == ScEsc {
 		value.IsSpecial = true

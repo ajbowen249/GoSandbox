@@ -18,13 +18,12 @@ func main() {
 	console.ClearScreen(80, 25)
 
 	sprite := new(rc.Sprite)
-	sprite.Width = 2
-	sprite.Height = 2
 	sprite.X = 4
 	sprite.Y = 3
 
-	spriteChars := rc.StringToArray(sprite.Width, sprite.Height, "SSS ")
-	spriteColors := rc.FillArrayI(sprite.Width, sprite.Height, console.ChFgCyan)
+	spriteChars := rc.StringToArray(2, 2, "SSS ")
+	rc.Replace(&spriteChars, ' ', rc.TransparancyChar)
+	spriteColors := rc.FillArrayI(2, 2, console.ChFgCyan)
 	spriteColors[0][1] = console.ChFgGreen | console.ChBgDarkMagenta
 	sprite.SetGraphics(spriteChars, spriteColors)
 
@@ -71,54 +70,59 @@ func setup() *rc.RogueConsole {
 	blueArray := rc.FillArrayI(25, 9, console.ChFgBlue)
 	yellowArray := rc.FillArrayI(25, 9, console.ChFgYellow)
 
-	bg1 :=
-		"┌───────────────────────┐" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"│                       │" +
-			"└───────────────────────┘"
+	bg1 := rc.StringToArray(25, 9,
+		"┌───────────────────────┐"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"│                       │"+
+			"└───────────────────────┘")
 
-	bg2 :=
-		"                         " +
-			"                         " +
-			"  /─\\                    " +
-			"  \\─/                    " +
-			"                         " +
-			"          1234           " +
-			"                         " +
-			"                         " +
-			"                         "
+	bg2 := rc.StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  /─\\                    "+
+			"  \\─/                    "+
+			"                         "+
+			"          1234           "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	fg1 :=
-		"                         " +
-			"                         " +
-			"  ab                     " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         "
+	fg1 := rc.StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  ab                     "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	fg2 :=
-		"                         " +
-			"                         " +
-			"  c                      " +
-			"  d                      " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         " +
-			"                         "
+	fg2 := rc.StringToArray(25, 9,
+		"                         "+
+			"                         "+
+			"  c                      "+
+			"  d                      "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         "+
+			"                         ")
 
-	con.AddBackground(rc.StringToArray(25, 9, bg1), redArray)
-	con.AddBackground(rc.StringToArray(25, 9, bg2), greenArray)
-	con.AddForeground(rc.StringToArray(25, 9, fg1), blueArray)
-	con.AddForeground(rc.StringToArray(25, 9, fg2), yellowArray)
+	rc.Replace(&bg1, ' ', rc.TransparancyChar)
+	rc.Replace(&bg2, ' ', rc.TransparancyChar)
+	rc.Replace(&fg1, ' ', rc.TransparancyChar)
+	rc.Replace(&fg2, ' ', rc.TransparancyChar)
+
+	con.AddBackground(bg1, redArray)
+	con.AddBackground(bg2, greenArray)
+	con.AddForeground(fg1, blueArray)
+	con.AddForeground(fg2, yellowArray)
 
 	con.CameraX = 0
 	con.CameraY = 0
