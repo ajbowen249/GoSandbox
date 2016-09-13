@@ -6,7 +6,7 @@ import (
 	"github.com/ajbowen249/GoSandbox/console"
 )
 
-const defaultCharacterAttributes = console.ChFgWhite | console.ChBgBlack
+const defaultTransparencyColor = console.ChBgBlack
 
 //TransparancyChar is the rune that flags a transparency
 const TransparancyChar = rune(0x00)
@@ -15,6 +15,7 @@ const TransparancyChar = rune(0x00)
 //its given sprites, foregrounds, and backgrounds.
 type RogueConsole struct {
 	EnvWidth, EnvHeight, CameraWidth, CameraHeight, CameraX, CameraY int
+	TransparencyColor                                                int
 
 	bgLayers, fgLayers [][][]rune
 	bgColors, fgColors [][][]int
@@ -30,6 +31,7 @@ func NewRogueConsole(envWidth int, envHeight int, cameraWidth int, cameraHeight 
 	con.EnvHeight = envHeight
 	con.CameraWidth = cameraWidth
 	con.CameraHeight = cameraHeight
+	con.TransparencyColor = defaultTransparencyColor
 
 	return con
 }
@@ -59,14 +61,14 @@ func (con *RogueConsole) RegisterSprite(sp *Sprite, layer int) {
 //and sprites drawn.
 func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
 	frame := FillArrayR(con.CameraWidth, con.CameraHeight, TransparancyChar)
-	frameColors := FillArrayI(con.CameraWidth, con.CameraHeight, defaultCharacterAttributes)
+	frameColors := FillArrayI(con.CameraWidth, con.CameraHeight, con.TransparencyColor)
 
 	for i := 0; i < len(con.bgLayers); i++ {
 		grabWindow(con.CameraX, con.CameraY, con.CameraWidth, con.CameraHeight, &con.bgLayers[i], &con.bgColors[i], &frame, &frameColors)
 	}
 
 	spriteLayer := FillArrayR(con.EnvWidth, con.EnvHeight, TransparancyChar)
-	spriteColors := FillArrayI(con.EnvWidth, con.EnvHeight, defaultCharacterAttributes)
+	spriteColors := FillArrayI(con.EnvWidth, con.EnvHeight, con.TransparencyColor)
 
 	for layer := len(con.sprites) - 1; layer >= 0; layer-- {
 		for sprite := 0; sprite < len(con.sprites[layer]); sprite++ {

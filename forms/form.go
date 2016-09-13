@@ -38,12 +38,13 @@ type Form struct {
 }
 
 //NewForm creates and initializes a form.
-func NewForm(width int, height int) *Form {
+func NewForm(width int, height int, backgroundColor int) *Form {
 	form := new(Form)
 	form.Controls = make(map[string]Control)
 
 	form.currentTabIndex = -1
 	form.visual = rc.NewRogueConsole(width, height, width, height)
+	form.visual.TransparencyColor = backgroundColor
 	form.isVisualValid = false
 
 	return form
@@ -116,6 +117,7 @@ func (form *Form) Process() {
 // InitiVisual passes the form's visual context to
 // the InitiVisual method of all controls.
 func (form *Form) InitiVisual() {
+	console.SetCursorProperties(1, false)
 	form.forAllControls(func(control Control) {
 		control.InitVisual(form.visual)
 	})

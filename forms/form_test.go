@@ -48,7 +48,7 @@ func (tc *TestControl) SetOwner(*Form) {
 }
 
 func TestAutoFocusOrder(t *testing.T) {
-	testForm := NewForm(80, 25)
+	testForm := NewForm(80, 25, 0)
 	numTestControls := 10
 	testControls := make([]*TestControl, numTestControls)
 
@@ -70,7 +70,7 @@ func TestAutoFocusOrder(t *testing.T) {
 }
 
 func TestSpecificFocus(t *testing.T) {
-	testForm := NewForm(80, 25)
+	testForm := NewForm(80, 25, 0)
 
 	tc1 := NewTestControl("tc1")
 	tc2 := NewTestControl("tc2")
@@ -92,7 +92,7 @@ func TestSpecificFocus(t *testing.T) {
 }
 
 func TestUnfocusableItems(t *testing.T) {
-	testForm := NewForm(80, 25)
+	testForm := NewForm(80, 25, 0)
 
 	tc1 := NewTestControl("tc1")
 	tc2 := NewTestControl("tc2")
@@ -131,7 +131,7 @@ func TestUnfocusableItems(t *testing.T) {
 }
 
 func TestProces(t *testing.T) {
-	testForm := NewForm(80, 25)
+	testForm := NewForm(80, 25, 0)
 
 	numControls := 10
 	var processedControls []string

@@ -39,28 +39,34 @@ func NewButton(name string) *Button {
 	btn.disabledTextColor = console.ChFgWhite
 	btn.shadowColor = console.ChBgBlack
 
+	btn.sprite = new(rc.Sprite)
+
 	return btn
 }
 
-// SetText is builder-pattern method that sets the text
-// of a button.
-func (btn *Button) SetText(newText string) *Button {
+// SetText sets the text
+func (btn *Button) SetText(newText string) {
 	btn.text = newText
-	return btn
 }
 
-// SetXPadding is builder-pattern method that sets the xPadding
-// of a button.
-func (btn *Button) SetXPadding(newPadding int) *Button {
+// SetXPadding sets the x padding
+func (btn *Button) SetXPadding(newPadding int) {
 	btn.xPadding = newPadding
-	return btn
 }
 
-// SetYPadding is builder-pattern method that sets the yPadding
-// of a button.
-func (btn *Button) SetYPadding(newPadding int) *Button {
+// SetYPadding sets the y padding
+func (btn *Button) SetYPadding(newPadding int) {
 	btn.yPadding = newPadding
-	return btn
+}
+
+// SetX sets the x value
+func (btn *Button) SetX(x int) {
+	btn.x = x
+}
+
+// SetY sets the y value
+func (btn *Button) SetY(y int) {
+	btn.y = y
 }
 
 // GetName returns the name of the button.
@@ -89,8 +95,11 @@ func (btn *Button) Process(frameInfo *FrameInfo) {
 	if btn.hasFocus {
 		if frameInfo.KeyInfo.KeyDown {
 			if !frameInfo.KeyInfo.IsSpecial {
-				if !btn.isPressed && frameInfo.KeyInfo.Char == '\n' || frameInfo.KeyInfo.Char == ' ' {
+				if !btn.isPressed && (frameInfo.KeyInfo.Char == '\r' || frameInfo.KeyInfo.Char == ' ') {
 					btn.press()
+				} else if frameInfo.KeyInfo.Char == '\t' {
+					btn.unpress()
+					btn.owner.FocusNext()
 				}
 			}
 		} else {
@@ -106,6 +115,7 @@ func (btn *Button) Process(frameInfo *FrameInfo) {
 // container's visual engine.
 func (btn *Button) InitVisual(rCon *rc.RogueConsole) {
 	rCon.RegisterSprite(btn.sprite, btn.layer)
+	btn.draw()
 }
 
 // SetOwner sets the owner form
@@ -124,6 +134,9 @@ func (btn *Button) unpress() {
 }
 
 func (btn *Button) draw() {
+	btn.sprite.X = btn.x
+	btn.sprite.Y = btn.y
+
 	rectWidth := len(btn.text) + (btn.xPadding * 2)
 	rectHeight := (btn.yPadding * 2) + 1
 
