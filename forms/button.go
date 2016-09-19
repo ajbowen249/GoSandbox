@@ -69,6 +69,11 @@ func (btn *Button) SetY(y int) {
 	btn.y = y
 }
 
+// SetExecute sets the button's execute function
+func (btn *Button) SetExecute(callback func()) {
+	btn.execute = callback
+}
+
 // GetName returns the name of the button.
 func (btn *Button) GetName() string {
 	return btn.name
@@ -99,7 +104,7 @@ func (btn *Button) Process(frameInfo *FrameInfo) {
 					btn.press()
 				} else if frameInfo.KeyInfo.Char == '\t' {
 					btn.unpress()
-					btn.owner.FocusNext()
+					btn.owner.FlagFocusNext()
 				}
 			}
 		} else {

@@ -34,7 +34,8 @@ type Form struct {
 
 	currentTabIndex int
 	visual          *rc.RogueConsole
-	isVisualValid   bool
+	isVisualValid, focusNextFlag, focusSpecificFlag bool
+	focusSpecificName string
 }
 
 //NewForm creates and initializes a form.
@@ -45,7 +46,10 @@ func NewForm(width int, height int, backgroundColor int) *Form {
 	form.currentTabIndex = -1
 	form.visual = rc.NewRogueConsole(width, height, width, height)
 	form.visual.TransparencyColor = backgroundColor
+	
 	form.isVisualValid = false
+	form.focusNextFlag = false
+	form.focusSpecificFlag = false
 
 	return form
 }
@@ -64,42 +68,6 @@ func (form *Form) AddControl(control Control, autoAddTabOrder bool) {
 	form.TabOrder = append(form.TabOrder, control.GetName())
 }
 
-// FocusNext moves focus from the current control
-// to the next control specified in the default
-// tab order.
-func (form *Form) FocusNext() {
-	form.unfocusCurrentControl()
-
-	newIndex := form.currentTabIndex
-
-	for true {
-		newIndex = (newIndex + 1) % len(form.TabOrder)
-
-		//we've looped all the way around and found no focusable controls
-		if newIndex == form.currentTabIndex {
-			form.currentTabIndex = -1
-			return
-		}
-
-		if form.Controls[form.TabOrder[newIndex]].Focus() {
-			form.currentTabIndex = newIndex
-			return
-		}
-	}
-}
-
-// FocusSpecific moves focus to the control with the given name
-// and sets the tab index to the index of that control.
-func (form *Form) FocusSpecific(controlName string) {
-	form.unfocusCurrentControl()
-
-	if form.Controls[controlName].Focus() {
-		form.currentTabIndex = algorithms.SearchSliceString(form.TabOrder, controlName)
-	} else {
-		form.currentTabIndex = -1
-	}
-}
-
 // Process calls the Process method on all controls.
 func (form *Form) Process() {
 	_, keyInfo := console.GetKeyEX()
@@ -108,6 +76,8 @@ func (form *Form) Process() {
 	form.forAllControls(func(control Control) {
 		control.Process(frameInfo)
 	})
+
+	form.handleFocusFlags()
 
 	if !form.isVisualValid {
 		form.redraw()
@@ -128,6 +98,62 @@ func (form *Form) InvalidateVisual() {
 	form.isVisualValid = false
 }
 
+// FlagFocusNext triggers the form to advance focus
+// at the end of the current Process loop.
+// Note: multiple calls overwrite the focus flags,
+// and will not queue up.
+func (form *Form) FlagFocusNext(){
+	form.focusSpecificFlag = false
+	form.focusNextFlag = true
+}
+
+// FlagFocusSpecific triggers the form to move focus
+// to the specified controlat the end of the current 
+// Process loop.
+// Note: multiple calls overwrite the focus flags,
+// and will not queue up.
+func (form *Form) FlagFocusSpecific(controlName string){
+	form.focusNextFlag = false
+	form.focusSpecificFlag = true
+	form.focusSpecificName = controlName
+}
+
+// focusNext moves focus from the current control
+// to the next control specified in the default
+// tab order.
+func (form *Form) focusNext() {
+	form.unfocusCurrentControl()
+
+	newIndex := form.currentTabIndex
+
+	for true {
+		newIndex = (newIndex + 1) % len(form.TabOrder)
+
+		//we've looped all the way around and found no focusable controls
+		if newIndex == form.currentTabIndex {
+			form.currentTabIndex = -1
+			return
+		}
+
+		if form.Controls[form.TabOrder[newIndex]].Focus() {
+			form.currentTabIndex = newIndex
+			return
+		}
+	}
+}
+
+// focusSpecific moves focus to the control with the given name
+// and sets the tab index to the index of that control.
+func (form *Form) focusSpecific(controlName string) {
+	form.unfocusCurrentControl()
+
+	if form.Controls[controlName].Focus() {
+		form.currentTabIndex = algorithms.SearchSliceString(form.TabOrder, controlName)
+	} else {
+		form.currentTabIndex = -1
+	}
+}
+
 func (form *Form) unfocusCurrentControl() {
 	if form.currentTabIndex != -1 {
 		form.Controls[form.TabOrder[form.currentTabIndex]].Unfocus()
@@ -143,4 +169,17 @@ func (form *Form) forAllControls(action func(Control)) {
 func (form *Form) redraw() {
 	form.visual.Draw()
 	form.isVisualValid = true
+}
+
+func (form *Form) handleFocusFlags(){
+	if form.focusNextFlag{
+		form.focusNext()
+	}
+
+	if form.focusSpecificFlag{
+		form.focusSpecific(form.focusSpecificName)
+	}
+
+	form.focusNextFlag = false
+	form.focusSpecificFlag = false
 }

@@ -58,7 +58,7 @@ func TestAutoFocusOrder(t *testing.T) {
 	}
 
 	for i := 0; i < numTestControls; i++ {
-		testForm.FocusNext()
+		testForm.focusNext()
 
 		for j := 0; j < numTestControls; j++ {
 			expectFocus := j == i
@@ -78,13 +78,13 @@ func TestSpecificFocus(t *testing.T) {
 	testForm.AddControl(tc1, true)
 	testForm.AddControl(tc2, true)
 
-	testForm.FocusSpecific("tc2")
+	testForm.focusSpecific("tc2")
 
 	if !tc2.HasFocus {
 		t.Errorf("Expected that tc2 would have focus, and it did not.")
 	}
 
-	testForm.FocusSpecific("tc1")
+	testForm.focusSpecific("tc1")
 
 	if !tc1.HasFocus {
 		t.Errorf("Expected that tc1 would have focus, and it did not.")
@@ -107,7 +107,7 @@ func TestUnfocusableItems(t *testing.T) {
 	testForm.AddControl(tc3, true)
 	testForm.AddControl(tc4, true)
 
-	testForm.FocusNext()
+	testForm.focusNext()
 
 	failMessage := "Expected that %v would%v have focus."
 
@@ -115,7 +115,7 @@ func TestUnfocusableItems(t *testing.T) {
 		t.Errorf(failMessage, "tc1", "")
 	}
 
-	testForm.FocusNext()
+	testForm.focusNext()
 
 	if tc2.HasFocus {
 		t.Errorf(failMessage, "tc2", "n't")

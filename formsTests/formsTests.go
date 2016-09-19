@@ -27,12 +27,28 @@ func main() {
 	button2.SetX(20)
 	button2.SetY(3)
 
+	quit := false
+
+	quitButton := forms.NewButton("btnQuit")
+	quitButton.SetText("Exit")
+	quitButton.SetXPadding(1)
+	quitButton.SetYPadding(1)
+	quitButton.SetX(72)
+	quitButton.SetY(20)
+	quitButton.SetExecute(func() {
+		quit = true
+	})
+
 	form.AddControl(button1, true)
 	form.AddControl(button2, true)
+	form.AddControl(quitButton, true)
 	form.InitiVisual()
-	form.FocusNext()
+	form.FlagFocusNext()
 
 	for true {
 		form.Process()
+		if quit {
+			break
+		}
 	}
 }
