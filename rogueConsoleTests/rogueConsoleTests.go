@@ -1,17 +1,14 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/ajbowen249/GoSandbox/console"
 	rc "github.com/ajbowen249/GoSandbox/rogueConsole"
 )
 
 func main() {
-	gotAttrs, initAttrs := console.GetDefaultAttributes()
-	if gotAttrs {
-		defer console.SetAttributes(initAttrs)
-	}
+	console.SaveInitialScreenState()
+	defer console.RestoreInitialScreenState()
+	console.SetNoEcho()
 
 	rCon := setup()
 	console.SetCursorProperties(false)
@@ -31,30 +28,52 @@ func main() {
 
 	rCon.Draw()
 
-	for {
-		isHit, char := console.GetKey()
-		if isHit {
+	goUp := func() {
+		if sprite.Y > 0 {
+			sprite.Y--
+		}
+	}
 
-			char = strings.ToLower(char)
-			switch char {
-			case "w":
-				if sprite.Y > 0 {
-					sprite.Y--
+	goDown := func() {
+		if sprite.Y < rCon.EnvHeight {
+			sprite.Y++
+		}
+	}
+
+	goLeft := func() {
+		if sprite.X > 0 {
+			sprite.X--
+		}
+	}
+
+	goRight := func() {
+		if sprite.X < rCon.EnvWidth {
+			sprite.X++
+		}
+	}
+
+	for {
+		isHit, keyInfo := console.GetKey()
+			if isHit {
+				if !keyInfo.IsSpecial {
+				switch keyInfo.Char {
+				case 'w': goUp()
+				case 'a': goLeft()
+				case 's': goDown()
+				case 'd': goRight()
+				case 'q':
+					return
 				}
-			case "a":
-				if sprite.X > 0 {
-					sprite.X--
+
+			} else {
+				switch keyInfo.SpecialChar {
+				case console.ScArrowUp: goUp()
+				case console.ScArrowLeft: goLeft()
+				case console.ScArrowDown: goDown()
+				case console.ScArrowRight: goRight()
+				case console.ScEsc:
+					return
 				}
-			case "s":
-				if sprite.Y < rCon.EnvHeight {
-					sprite.Y++
-				}
-			case "d":
-				if sprite.X < rCon.EnvWidth {
-					sprite.X++
-				}
-			case "q":
-				return
 			}
 
 			rCon.Draw()

@@ -70,7 +70,7 @@ func (form *Form) AddControl(control Control, autoAddTabOrder bool) {
 
 // Process calls the Process method on all controls.
 func (form *Form) Process() {
-	_, keyInfo := console.GetKeyEX()
+	_, keyInfo := console.GetKey()
 	frameInfo := &FrameInfo{keyInfo}
 
 	form.forAllControls(func(control Control) {

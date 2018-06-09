@@ -58,27 +58,28 @@ package console
 // #include <fcntl.h>
 // const int IS_WINDOWS = 0;
 //
-// // Stole this from here: https://cboard.cprogramming.com/c-programming/63166-kbhit-linux.html
-// int kbhit()
-// {
-//     struct termios oldt, newt;
-//     int ch;
-//     int oldf;
+// // console properties
+// struct termios initialTermios, currentTermios;
+// int cursorDefaultVisible = 1;
 //
-//     tcgetattr(STDIN_FILENO, &oldt);
-//     newt = oldt;
-//     newt.c_lflag &= ~(ICANON | ECHO);
-//     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+//
+// void SetNoEcho() {
+//     currentTermios.c_lflag &= ~(ICANON | ECHO);
+//     tcsetattr(STDIN_FILENO, TCSANOW, &currentTermios);
+// }
+//
+// // Stole this from here: https://cboard.cprogramming.com/c-programming/63166-kbhit-linux.html
+// int kbhit() {
+//     int ch, oldf;
+//
 //     oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
 //     fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 //
 //     ch = getchar();
 //
-//     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 //     fcntl(STDIN_FILENO, F_SETFL, oldf);
 //
-//     if(ch != EOF)
-//     {
+//     if(ch != EOF) {
 //         ungetc(ch, stdin);
 //         return 1;
 //     }
@@ -103,10 +104,11 @@ package console
 //        character = getchar();
 //        if ( character == 0x1b) {
 //            // Make this work like Windows
-//            if(kbhit())
-//            {
-//                getchar(); // skip the '['
+//            char next = getchar(); // skip the '['
+//            if (next == '[') {
 //                return 0xE0; // return the windows special character identifier
+//            } else {
+//                ungetc(next, stdin);
 //            }
 //        }
 //     }
@@ -152,18 +154,22 @@ package console
 //     fflush(stdout);
 // }
 //
+// void SaveInitialScreenState() {
+//     tcgetattr(STDIN_FILENO, &initialTermios);
+//     currentTermios = initialTermios;
+// }
+//
+// void RestoreInitialScreenState() {
+//     tcsetattr(STDIN_FILENO, TCSANOW, &initialTermios);
+//     currentTermios = initialTermios;
+//     SetCursorProperties(cursorDefaultVisible);
+// }
+//
 // #endif // __WINDOWS__
 import "C"
 import (
 	"fmt"
 )
-
-// Attributes contains data about the current console window.
-type Attributes struct {
-	CharacterColor int
-	ShowCursor     bool
-	Echo           bool
-}
 
 // KeyboardInputInfo contains data about a single keyboard event.
 // It could represent either a character key or a special code.
@@ -172,6 +178,24 @@ type KeyboardInputInfo struct {
 	KeyDown, IsSpecial bool
 	Char               rune
 	SpecialChar        byte
+}
+
+// SaveInitialScreenState saves initial properties of the console
+// so they can be restored on shutdown.
+func SaveInitialScreenState() {
+	C.SaveInitialScreenState()
+}
+
+// RestoreInitialScreenState restores the initial console
+// properties for cleanup.
+func RestoreInitialScreenState() {
+	C.RestoreInitialScreenState()
+}
+
+// SetNoEcho disables console echo (if necessary on
+// platform).
+func SetNoEcho() {
+	C.SetNoEcho()
 }
 
 // MoveTo sets the console cursor postition
@@ -193,27 +217,13 @@ func ClearScreen(numCols int, numRows int) {
 }
 
 // GetKey returns a bool indicating whether a key
-// was pressed on the keyboard and a string for
-// which character was pressed. It does not block
-// for input.
-func GetKey() (bool, string) {
-	character := ""
-	isHit := false
-	fromC := C.GetKey()
-
-	if byte(fromC) != 0x00 {
-		character = C.GoStringN(&fromC, 1)
-		isHit = true
-	}
-
-	return isHit, character
-}
-
-// GetKeyEX returns a bool indicating whether a key
 // was pressed on the keyboard and a KeyboardInputInfo
 // for what pressed. It does not block
 // for input.
-func GetKeyEX() (bool, KeyboardInputInfo) {
+// It is recommended that SetNoEcho()
+// is called during program initialization if
+// you plan to use this.
+func GetKey() (bool, KeyboardInputInfo) {
 	value := KeyboardInputInfo{false, false, ' ', 0x00}
 
 	fromC := C.GetKey()
@@ -275,23 +285,6 @@ func SetCursorProperties(isVisible bool) {
 // the Ch* constants in this package.
 func SetCharacterProperties(properties int) {
 	C.SetCharacterProperties(C.int(properties))
-}
-
-// GetDefaultAttributes returns data abound the current console window.
-func GetDefaultAttributes() (bool, Attributes) {
-	// infoBuffer := new(C.CONSOLE_SCREEN_BUFFER_INFO)
-	// if int(C.GetConAttributes(infoBuffer)) != 0 {
-	// 	return true, Attributes{int(infoBuffer.wAttributes)}
-	// }
-
-	return true, Attributes{ChFgWhite | ChBgBlack, true, true}
-}
-
-// SetAttributes takes a Attributes and sets all the
-// current window's properties to match.
-func SetAttributes(info Attributes) {
-	SetCharacterProperties(info.CharacterColor)
-	SetCursorProperties(info.ShowCursor)
 }
 
 const (
