@@ -6,12 +6,15 @@ import (
 )
 
 func main() {
-	gotInfo, initScreenInfo := console.GetScreenBufferInfo()
-	if gotInfo {
-		defer console.SetScreenBufferInfo(initScreenInfo)
-	}
+	standardBuffer := console.GetStandardScreenBufferHandle()
+	defer console.SetActiveScreenBuffer(standardBuffer)
+
+	appBuffer := console.CreateNewScreenBuffer()
+	console.SetActiveScreenBuffer(appBuffer)
+	console.SetCursorPropertiesForBuffer(1, false, appBuffer)
 
 	form := forms.NewForm(80, 25, console.ChBgDarkGrey)
+	form.SetAlternateScreenBuffer(appBuffer)
 
 	button1 := forms.NewButton("btn1")
 	button1.SetText("Button")

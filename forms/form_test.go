@@ -130,7 +130,7 @@ func TestUnfocusableItems(t *testing.T) {
 	}
 }
 
-func TestProces(t *testing.T) {
+func TestProcess(t *testing.T) {
 	testForm := NewForm(80, 25, 0)
 
 	numControls := 10

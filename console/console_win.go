@@ -25,13 +25,13 @@ package console
 //     return character;
 // }
 //
-// void SetCursorProperties(int fill, int visible)
+// void SetCursorProperties(int fill, int visible, HANDLE handle)
 // {
 //     CONSOLE_CURSOR_INFO cursorInfo;
 //     cursorInfo.dwSize = (DWORD)fill;
 //     cursorInfo.bVisible = (BOOL)visible;
 //
-//     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+//     SetConsoleCursorInfo(handle, &cursorInfo);
 // }
 //
 // void SetCharacterProperties(int properties)
@@ -43,6 +43,43 @@ package console
 // {
 //     return GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), infoBuffer);
 // }
+//
+// HANDLE CreateNewConsoleScreenBuffer()
+// {
+//     return CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
+//          FILE_SHARE_READ | FILE_SHARE_WRITE,
+//          NULL,
+//          CONSOLE_TEXTMODE_BUFFER,
+//          NULL);
+// }
+//
+// CHAR_INFO MakeCharInfo(CHAR character, WORD colors)
+// {
+//     CHAR_INFO info;
+//     info.Char.AsciiChar = character;
+//     info.Attributes = colors;
+//     return info;
+// }
+//
+// void WriteToBuffer(HANDLE handle, SHORT width, SHORT height, CHAR_INFO* buffer)
+// {
+//     COORD size;
+//     size.X = width;
+//     size.Y = height;
+//
+//     COORD coord;
+//     coord.X = 0;
+//     coord.Y = 0;
+//
+//     SMALL_RECT rect;
+//     rect.Left = 0;
+//     rect.Top = 0;
+//     rect.Right = 79;
+//     rect.Bottom = 24;
+//
+//     WriteConsoleOutput(handle, buffer, size, coord, &rect);
+// }
+//
 import "C"
 import (
 	"fmt"
@@ -54,13 +91,18 @@ type ScreenBufferInfo struct {
 	CharacterColor int
 }
 
+// ScreenBufferHandle allows access to specific console screen buffers.
+type ScreenBufferHandle struct {
+	handle C.HANDLE
+}
+
 // KeyboardInputInfo contains data about a single keyboard event.
 // It could represent either a character key or a special code.
 // The codes are wrapped up in the Sc* constants in thie package.
 type KeyboardInputInfo struct {
-	KeyDown, IsSpecial   bool
-	Char        rune
-	SpecialChar byte
+	KeyDown, IsSpecial bool
+	Char               rune
+	SpecialChar        byte
 }
 
 // MoveTo sets the console cursor postition
@@ -112,7 +154,7 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 		return false, value
 	}
 
-    value.KeyDown = true
+	value.KeyDown = true
 
 	if fromB == ScEsc {
 		value.IsSpecial = true
@@ -136,6 +178,15 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 // by the cursor, from 1 to 100. The second argument sets
 // whether the cursor is visible.
 func SetCursorProperties(fillPercent int, isVisible bool) {
+	SetCursorPropertiesForBuffer(fillPercent, isVisible, GetStandardScreenBufferHandle())
+}
+
+// SetCursorPropertiesForBuffer sets the visibility of the
+// for the specific buffer at the given handle. The first
+// argument is the percentage of the cell filled by the cursor,
+// from 1 to 100. The second argument sets whether the cursor is
+// visible.
+func SetCursorPropertiesForBuffer(fillPercent int, isVisible bool, handle ScreenBufferHandle) {
 	visible := 0
 	if isVisible {
 		visible = 1
@@ -148,7 +199,7 @@ func SetCursorProperties(fillPercent int, isVisible bool) {
 		fillPercent = 100
 	}
 
-	C.SetCursorProperties(C.int(fillPercent), C.int(visible))
+	C.SetCursorProperties(C.int(fillPercent), C.int(visible), handle.handle)
 }
 
 // SetCharacterProperties sets the various properties
@@ -180,6 +231,47 @@ func SetTitle(title string) {
 	cTitle := C.CString(title)
 	defer C.free(unsafe.Pointer(cTitle))
 	C.SetConsoleTitle((*C.CHAR)(cTitle))
+}
+
+// CreateNewScreenBuffer creates a new screen buffer
+// and returns its handle.
+func CreateNewScreenBuffer() ScreenBufferHandle {
+	return ScreenBufferHandle{C.CreateNewConsoleScreenBuffer()}
+}
+
+// SetActiveScreenBuffer sets the active screen buffer via
+// the given handle.
+func SetActiveScreenBuffer(handle ScreenBufferHandle) {
+	C.SetConsoleActiveScreenBuffer(handle.handle)
+}
+
+// GetStandardScreenBufferHandle returns the handle to the standard
+// active screen buffer.
+func GetStandardScreenBufferHandle() ScreenBufferHandle {
+	return ScreenBufferHandle{C.GetStdHandle(C.STD_OUTPUT_HANDLE)}
+}
+
+// WriteToBuffer writes the given characters and colors to the buffer with the
+// given handle.
+func WriteToBuffer(handle ScreenBufferHandle, chars [][]rune, colors [][]int) {
+	height := len(chars)
+	if height == 0 {
+		return
+	}
+
+	width := len(chars[0])
+
+	charInfoBuffer := make([]C.CHAR_INFO, height*width)
+	k := 0
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			info := C.MakeCharInfo(C.CHAR(chars[i][j]), C.WORD(colors[i][j]))
+			charInfoBuffer[k] = info
+			k++
+		}
+	}
+
+	C.WriteToBuffer(handle.handle, C.SHORT(width), C.SHORT(height), &charInfoBuffer[0])
 }
 
 const (

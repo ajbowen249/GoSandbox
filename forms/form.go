@@ -32,10 +32,13 @@ type Form struct {
 	Controls map[string]Control
 	TabOrder []string
 
-	currentTabIndex int
-	visual          *rc.RogueConsole
+	currentTabIndex                                 int
+	visual                                          *rc.RogueConsole
 	isVisualValid, focusNextFlag, focusSpecificFlag bool
-	focusSpecificName string
+	focusSpecificName                               string
+
+	hasAlternateScreenBuffer bool
+	alternateBuffer          console.ScreenBufferHandle
 }
 
 //NewForm creates and initializes a form.
@@ -46,12 +49,18 @@ func NewForm(width int, height int, backgroundColor int) *Form {
 	form.currentTabIndex = -1
 	form.visual = rc.NewRogueConsole(width, height, width, height)
 	form.visual.TransparencyColor = backgroundColor
-	
+
 	form.isVisualValid = false
 	form.focusNextFlag = false
 	form.focusSpecificFlag = false
 
 	return form
+}
+
+// SetAlternateScreenBuffer sets the form to draw its graphics to an alternate screen buffer.
+func (form *Form) SetAlternateScreenBuffer(alternateBuffer console.ScreenBufferHandle) {
+	form.hasAlternateScreenBuffer = true
+	form.alternateBuffer = alternateBuffer
 }
 
 // AddControl adds a new control to the form.
@@ -102,17 +111,17 @@ func (form *Form) InvalidateVisual() {
 // at the end of the current Process loop.
 // Note: multiple calls overwrite the focus flags,
 // and will not queue up.
-func (form *Form) FlagFocusNext(){
+func (form *Form) FlagFocusNext() {
 	form.focusSpecificFlag = false
 	form.focusNextFlag = true
 }
 
 // FlagFocusSpecific triggers the form to move focus
-// to the specified controlat the end of the current 
+// to the specified controlat the end of the current
 // Process loop.
 // Note: multiple calls overwrite the focus flags,
 // and will not queue up.
-func (form *Form) FlagFocusSpecific(controlName string){
+func (form *Form) FlagFocusSpecific(controlName string) {
 	form.focusNextFlag = false
 	form.focusSpecificFlag = true
 	form.focusSpecificName = controlName
@@ -167,16 +176,21 @@ func (form *Form) forAllControls(action func(Control)) {
 }
 
 func (form *Form) redraw() {
-	form.visual.Draw()
+	if form.hasAlternateScreenBuffer {
+		form.visual.DrawToBuffer(form.alternateBuffer)
+	} else {
+		form.visual.Draw()
+	}
+
 	form.isVisualValid = true
 }
 
-func (form *Form) handleFocusFlags(){
-	if form.focusNextFlag{
+func (form *Form) handleFocusFlags() {
+	if form.focusNextFlag {
 		form.focusNext()
 	}
 
-	if form.focusSpecificFlag{
+	if form.focusSpecificFlag {
 		form.focusSpecific(form.focusSpecificName)
 	}
 

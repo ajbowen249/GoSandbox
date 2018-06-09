@@ -96,6 +96,13 @@ func (con *RogueConsole) Draw() {
 	})
 }
 
+// DrawToBuffer outputs the frame buffer to the console screen buffer with
+// the given handle.
+func (con *RogueConsole) DrawToBuffer(handle console.ScreenBufferHandle) {
+	characters, colors := con.GetFrameArray()
+	console.WriteToBuffer(handle, characters, colors)
+}
+
 // Visit passes each rune in the frame array through the
 // given visitor function
 func (con *RogueConsole) Visit(visit func(rune, int, int, int)) {
@@ -134,8 +141,8 @@ func drawSprite(sprite *Sprite, charDestination *[][]rune, colDestination *[][]i
 				charX < len((*charDestination)[0]) &&
 				charY >= 0 &&
 				charY < len(*charDestination) {
-				(*charDestination)[charY][charX] = character
-				(*colDestination)[charY][charX] = colSource[row][col]
+				    (*charDestination)[charY][charX] = character
+				    (*colDestination)[charY][charX] = colSource[row][col]
 			}
 		}
 	}
