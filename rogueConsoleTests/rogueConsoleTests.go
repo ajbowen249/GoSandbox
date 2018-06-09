@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	gotAttrs, initAttrs := console.GetScreenBufferInfo()
+	gotAttrs, initAttrs := console.GetDefaultAttributes()
 	if gotAttrs {
-		defer console.SetScreenBufferInfo(initAttrs)
+		defer console.SetAttributes(initAttrs)
 	}
 
 	rCon := setup()
-	console.SetCursorProperties(1, false)
+	console.SetCursorProperties(false)
 	console.ClearScreen(80, 25)
 
 	sprite := new(rc.Sprite)

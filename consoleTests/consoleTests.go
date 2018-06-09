@@ -10,14 +10,13 @@ func main() {
 	numCols := 80
 	numRows := 25
 
-	console.SetTitle("lol I set the title too")
 	console.ClearScreen(numCols, numRows)
 	x, y := 0, 0
 	console.MoveTo(x, y)
 	sprite := "O"
 	fmt.Print(sprite)
 	console.MoveTo(numCols-1, numRows-1)
-	_, info := console.GetScreenBufferInfo()
+	_, info := console.GetDefaultAttributes()
 
 	for {
 		isHit, event := console.GetKeyEX()

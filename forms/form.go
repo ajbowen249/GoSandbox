@@ -87,7 +87,7 @@ func (form *Form) Process() {
 // InitiVisual passes the form's visual context to
 // the InitiVisual method of all controls.
 func (form *Form) InitiVisual() {
-	console.SetCursorProperties(1, false)
+	console.SetCursorProperties(false)
 	form.forAllControls(func(control Control) {
 		control.InitVisual(form.visual)
 	})
