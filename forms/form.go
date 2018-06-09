@@ -46,7 +46,7 @@ func NewForm(width int, height int, backgroundColor int) *Form {
 	form.currentTabIndex = -1
 	form.visual = rc.NewRogueConsole(width, height, width, height)
 	form.visual.TransparencyColor = backgroundColor
-	
+
 	form.isVisualValid = false
 	form.focusNextFlag = false
 	form.focusSpecificFlag = false

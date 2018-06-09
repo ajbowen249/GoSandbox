@@ -83,25 +83,25 @@ func TestConsole1(t *testing.T) {
 	sprite2 := new(Sprite)
 	sprite2.X = 1
 	sprite2.Y = 1
-	sprite2.SetGraphics([][]rune{[]rune{'a', 'a', 'a', 'a'}}, [][]int{[]int{console.ChFgDarkBlue, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite}})
+	sprite2.SetGraphics([][]rune{{'a', 'a', 'a', 'a'}}, [][]int{{console.ChFgDarkBlue, console.ChFgWhite, console.ChFgWhite, console.ChFgWhite}})
 	con.RegisterSprite(sprite2, 3)
 
 	sprite3 := new(Sprite)
 	sprite3.X = 2
 	sprite3.Y = 1
-	sprite3.SetGraphics([][]rune{[]rune{'b', 'b', 'b'}}, [][]int{[]int{console.ChFgDarkCyan, console.ChFgWhite, console.ChFgWhite}})
+	sprite3.SetGraphics([][]rune{{'b', 'b', 'b'}}, [][]int{{console.ChFgDarkCyan, console.ChFgWhite, console.ChFgWhite}})
 	con.RegisterSprite(sprite3, 2)
 
 	sprite4 := new(Sprite)
 	sprite4.X = 3
 	sprite4.Y = 1
-	sprite4.SetGraphics([][]rune{[]rune{'c', 'c'}}, [][]int{[]int{console.ChFgDarkGreen, console.ChFgWhite}})
+	sprite4.SetGraphics([][]rune{{'c', 'c'}}, [][]int{{console.ChFgDarkGreen, console.ChFgWhite}})
 	con.RegisterSprite(sprite4, 1)
 
 	sprite5 := new(Sprite)
 	sprite5.X = 4
 	sprite5.Y = 1
-	sprite5.SetGraphics([][]rune{[]rune{'d'}}, [][]int{[]int{console.ChFgDarkGrey}})
+	sprite5.SetGraphics([][]rune{{'d'}}, [][]int{{console.ChFgGrey}})
 	con.RegisterSprite(sprite5, 0)
 
 	con.CameraX = 0
@@ -117,11 +117,11 @@ func TestConsole1(t *testing.T) {
 	expectedArray := StringToArray(5, 5, expectedString)
 
 	expectedColors := [][]int{
-		[]int{console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed},
-		[]int{console.ChFgRed, console.ChFgDarkBlue, console.ChFgDarkCyan, console.ChFgDarkGreen, console.ChFgDarkGrey},
-		[]int{console.ChFgRed, defaultTransparencyColor, console.ChFgYellow, console.ChFgBlue, console.ChFgGreen},
-		[]int{console.ChFgRed, defaultTransparencyColor, console.ChFgYellow, console.ChFgGreen, console.ChFgWhite},
-		[]int{console.ChFgRed, defaultTransparencyColor, defaultTransparencyColor, defaultTransparencyColor, console.ChFgWhite},
+		{console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed, console.ChFgRed},
+		{console.ChFgRed, console.ChFgDarkBlue, console.ChFgDarkCyan, console.ChFgDarkGreen, console.ChFgGrey},
+		{console.ChFgRed, defaultTransparencyColor, console.ChFgYellow, console.ChFgBlue, console.ChFgGreen},
+		{console.ChFgRed, defaultTransparencyColor, console.ChFgYellow, console.ChFgGreen, console.ChFgWhite},
+		{console.ChFgRed, defaultTransparencyColor, defaultTransparencyColor, defaultTransparencyColor, console.ChFgWhite},
 	}
 
 	con.Visit(func(r rune, i int, row int, col int) {

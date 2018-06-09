@@ -10,7 +10,7 @@ func main() {
 	defer console.RestoreInitialScreenState()
 	console.SetNoEcho()
 
-	form := forms.NewForm(80, 25, console.ChBgDarkGrey)
+	form := forms.NewForm(80, 25, console.ChBgGrey)
 
 	button1 := forms.NewButton("btn1")
 	button1.SetText("Button")
@@ -26,6 +26,12 @@ func main() {
 	button2.SetX(20)
 	button2.SetY(3)
 
+	textBox1 := forms.NewTextBox("tb1")
+	textBox1.SetText("")
+	textBox1.SetContentWidth(11)
+	textBox1.SetX(1)
+	textBox1.SetY(10)
+
 	quit := false
 
 	quitButton := forms.NewButton("btnQuit")
@@ -40,6 +46,7 @@ func main() {
 
 	form.AddControl(button1, true)
 	form.AddControl(button2, true)
+	form.AddControl(textBox1, true)
 	form.AddControl(quitButton, true)
 	form.InitiVisual()
 	form.FlagFocusNext()

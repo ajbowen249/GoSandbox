@@ -1,6 +1,7 @@
 // Package console provides basic console control
 // for positioning the cursor and non-blocking input.
 package console
+
 // #include "console.h"
 import "C"
 import (
@@ -131,8 +132,8 @@ const (
 	ChFgDarkRed     = C.FOREGROUND_RED
 	ChFgDarkMagenta = C.FOREGROUND_RED | C.FOREGROUND_BLUE
 	ChFgDarkYellow  = C.FOREGROUND_RED | C.FOREGROUND_GREEN
-	ChFgDarkGrey    = C.FOREGROUND_RED | C.FOREGROUND_GREEN | C.FOREGROUND_BLUE
-	ChFgGrey        = C.FOREGROUND_INTENSITY
+	ChFgGrey        = C.FOREGROUND_RED | C.FOREGROUND_GREEN | C.FOREGROUND_BLUE
+	ChFgDarkGrey    = C.FOREGROUND_INTENSITY // This is basically "light black"
 	ChFgBlue        = C.FOREGROUND_INTENSITY | C.FOREGROUND_BLUE
 	ChFgGreen       = C.FOREGROUND_INTENSITY | C.FOREGROUND_GREEN
 	ChFgCyan        = C.FOREGROUND_INTENSITY | C.FOREGROUND_GREEN | C.FOREGROUND_BLUE
@@ -148,8 +149,8 @@ const (
 	ChBgDarkRed     = C.BACKGROUND_RED
 	ChBgDarkMagenta = C.BACKGROUND_RED | C.BACKGROUND_BLUE
 	ChBgDarkYellow  = C.BACKGROUND_RED | C.BACKGROUND_GREEN
-	ChBgDarkGrey    = C.BACKGROUND_RED | C.BACKGROUND_GREEN | C.BACKGROUND_BLUE
-	ChBgGrey        = C.BACKGROUND_INTENSITY
+	ChBgGrey        = C.BACKGROUND_RED | C.BACKGROUND_GREEN | C.BACKGROUND_BLUE
+	ChBgDarkGrey    = C.BACKGROUND_INTENSITY // This is basically "light black"
 	ChBgBlue        = C.BACKGROUND_INTENSITY | C.BACKGROUND_BLUE
 	ChBgGreen       = C.BACKGROUND_INTENSITY | C.BACKGROUND_GREEN
 	ChBgCyan        = C.BACKGROUND_INTENSITY | C.BACKGROUND_GREEN | C.BACKGROUND_BLUE

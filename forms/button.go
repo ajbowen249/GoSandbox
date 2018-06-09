@@ -35,7 +35,7 @@ func NewButton(name string) *Button {
 	btn.enabledBgColor = console.ChBgBlue
 	btn.enabledTextColor = console.ChFgBlack
 	btn.focusedBGColor = console.ChBgRed
-	btn.disabledBgColor = console.ChBgGrey
+	btn.disabledBgColor = console.ChBgDarkGrey
 	btn.disabledTextColor = console.ChFgWhite
 	btn.shadowColor = console.ChBgBlack
 
