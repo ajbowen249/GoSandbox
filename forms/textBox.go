@@ -87,6 +87,11 @@ func (tb *TextBox) Process(frameInfo *FrameInfo) {
 			if !frameInfo.KeyInfo.IsSpecial {
 				if frameInfo.KeyInfo.Char == '\t' {
 					tb.owner.FlagFocusNext()
+				} else if byte(frameInfo.KeyInfo.Char) == console.ScDelete {
+					if len(tb.text) > 0 {
+						tb.text = string([]rune(tb.text)[0:len(tb.text) - 1])
+						tb.draw()
+					}
 				} else {
 					tb.text += string(frameInfo.KeyInfo.Char)
 					tb.draw()
@@ -151,9 +156,13 @@ func (tb *TextBox) draw() {
 
 	// fill in text
 	runeSlice := []rune(tb.text)
+	if tb.hasFocus && len(tb.text) > tb.contentWidth {
+		runeSlice = runeSlice[len(tb.text) - tb.contentWidth : len(tb.text)]
+	}
+
 	for i := 0; i < rectWidth-2; i++ {
 		cBuffer[1][i+1] = textColor
-		if i < len(tb.text) {
+		if i < len(runeSlice) {
 			rBuffer[1][i+1] = runeSlice[i]
 		}
 	}

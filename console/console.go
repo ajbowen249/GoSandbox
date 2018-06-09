@@ -169,6 +169,7 @@ const (
 	ScArrowDown  = 0x50
 	ScEsc        = 0x1B
 	ScIdentifier = 0xE0
+	ScDelete     = 0x7F
 )
 
 const (
