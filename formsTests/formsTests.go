@@ -6,10 +6,9 @@ import (
 )
 
 func main() {
-	gotInfo, initScreenInfo := console.GetScreenBufferInfo()
-	if gotInfo {
-		defer console.SetScreenBufferInfo(initScreenInfo)
-	}
+	console.SaveInitialScreenState()
+	defer console.RestoreInitialScreenState()
+	console.SetNoEcho()
 
 	form := forms.NewForm(80, 25, console.ChBgDarkGrey)
 

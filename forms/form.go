@@ -70,7 +70,7 @@ func (form *Form) AddControl(control Control, autoAddTabOrder bool) {
 
 // Process calls the Process method on all controls.
 func (form *Form) Process() {
-	_, keyInfo := console.GetKeyEX()
+	_, keyInfo := console.GetKey()
 	frameInfo := &FrameInfo{keyInfo}
 
 	form.forAllControls(func(control Control) {
@@ -87,7 +87,7 @@ func (form *Form) Process() {
 // InitiVisual passes the form's visual context to
 // the InitiVisual method of all controls.
 func (form *Form) InitiVisual() {
-	console.SetCursorProperties(1, false)
+	console.SetCursorProperties(false)
 	form.forAllControls(func(control Control) {
 		control.InitVisual(form.visual)
 	})

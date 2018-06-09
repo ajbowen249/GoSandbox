@@ -1,71 +1,42 @@
 // Package console provides basic console control
 // for positioning the cursor and non-blocking input.
 package console
-
-// #include <stdio.h>
-// #include <windows.h>
-// #include <conio.h>
-//
-// void MoveTo(SHORT row, SHORT column)
-// {
-//     COORD Cord;
-//     Cord.X = row;
-//     Cord.Y = column;
-//     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Cord);
-// }
-//
-// char GetKey()
-// {
-//     char character = 0x00;
-//     if(kbhit())
-//     {
-//        character = getch();
-//     }
-//
-//     return character;
-// }
-//
-// void SetCursorProperties(int fill, int visible)
-// {
-//     CONSOLE_CURSOR_INFO cursorInfo;
-//     cursorInfo.dwSize = (DWORD)fill;
-//     cursorInfo.bVisible = (BOOL)visible;
-//
-//     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
-// }
-//
-// void SetCharacterProperties(int properties)
-// {
-//     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)properties);
-// }
-//
-// int GetConScreenBufferInfo(CONSOLE_SCREEN_BUFFER_INFO* infoBuffer)
-// {
-//     return GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), infoBuffer);
-// }
+// #include "console.h"
 import "C"
 import (
 	"fmt"
-	"unsafe"
 )
-
-// ScreenBufferInfo contains data about the current console window.
-type ScreenBufferInfo struct {
-	CharacterColor int
-}
 
 // KeyboardInputInfo contains data about a single keyboard event.
 // It could represent either a character key or a special code.
 // The codes are wrapped up in the Sc* constants in thie package.
 type KeyboardInputInfo struct {
-	KeyDown, IsSpecial   bool
-	Char        rune
-	SpecialChar byte
+	KeyDown, IsSpecial bool
+	Char               rune
+	SpecialChar        byte
+}
+
+// SaveInitialScreenState saves initial properties of the console
+// so they can be restored on shutdown.
+func SaveInitialScreenState() {
+	C.SaveInitialScreenState()
+}
+
+// RestoreInitialScreenState restores the initial console
+// properties for cleanup.
+func RestoreInitialScreenState() {
+	C.RestoreInitialScreenState()
+}
+
+// SetNoEcho disables console echo (if necessary on
+// platform).
+func SetNoEcho() {
+	C.SetNoEcho()
 }
 
 // MoveTo sets the console cursor postition
 func MoveTo(column int, row int) {
-	C.MoveTo(C.SHORT(column), C.SHORT(row))
+	C.MoveTo(C.int(column), C.int(row))
 }
 
 // ClearScreen blanks out the console window
@@ -82,27 +53,13 @@ func ClearScreen(numCols int, numRows int) {
 }
 
 // GetKey returns a bool indicating whether a key
-// was pressed on the keyboard and a string for
-// which character was pressed. It does not block
-// for input.
-func GetKey() (bool, string) {
-	character := ""
-	isHit := false
-	fromC := C.GetKey()
-
-	if byte(fromC) != 0x00 {
-		character = C.GoStringN(&fromC, 1)
-		isHit = true
-	}
-
-	return isHit, character
-}
-
-// GetKeyEX returns a bool indicating whether a key
 // was pressed on the keyboard and a KeyboardInputInfo
 // for what pressed. It does not block
 // for input.
-func GetKeyEX() (bool, KeyboardInputInfo) {
+// It is recommended that SetNoEcho()
+// is called during program initialization if
+// you plan to use this.
+func GetKey() (bool, KeyboardInputInfo) {
 	value := KeyboardInputInfo{false, false, ' ', 0x00}
 
 	fromC := C.GetKey()
@@ -112,7 +69,7 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 		return false, value
 	}
 
-    value.KeyDown = true
+	value.KeyDown = true
 
 	if fromB == ScEsc {
 		value.IsSpecial = true
@@ -123,6 +80,20 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 	if fromB == ScIdentifier {
 		value.IsSpecial = true
 		value.SpecialChar = byte(C.GetKey())
+		// HACK: translate from posix
+		if C.IS_WINDOWS == 0 {
+			switch value.SpecialChar {
+			case ScArrowUpPosix:
+				value.SpecialChar = ScArrowUp
+			case ScArrowLeftPosix:
+				value.SpecialChar = ScArrowLeft
+			case ScArrowRightPosix:
+				value.SpecialChar = ScArrowRight
+			case ScArrowDownPosix:
+				value.SpecialChar = ScArrowDown
+			}
+		}
+
 		return true, value
 	}
 
@@ -135,20 +106,13 @@ func GetKeyEX() (bool, KeyboardInputInfo) {
 // The first argument is the percentage of the cell filled
 // by the cursor, from 1 to 100. The second argument sets
 // whether the cursor is visible.
-func SetCursorProperties(fillPercent int, isVisible bool) {
+func SetCursorProperties(isVisible bool) {
 	visible := 0
 	if isVisible {
 		visible = 1
 	}
 
-	if fillPercent < 1 {
-		fillPercent = 1
-	}
-	if fillPercent > 100 {
-		fillPercent = 100
-	}
-
-	C.SetCursorProperties(C.int(fillPercent), C.int(visible))
+	C.SetCursorProperties(C.int(visible))
 }
 
 // SetCharacterProperties sets the various properties
@@ -157,29 +121,6 @@ func SetCursorProperties(fillPercent int, isVisible bool) {
 // the Ch* constants in this package.
 func SetCharacterProperties(properties int) {
 	C.SetCharacterProperties(C.int(properties))
-}
-
-// GetScreenBufferInfo returns data abound the current console window.
-func GetScreenBufferInfo() (bool, ScreenBufferInfo) {
-	infoBuffer := new(C.CONSOLE_SCREEN_BUFFER_INFO)
-	if int(C.GetConScreenBufferInfo(infoBuffer)) != 0 {
-		return true, ScreenBufferInfo{int(infoBuffer.wAttributes)}
-	}
-
-	return false, ScreenBufferInfo{0}
-}
-
-// SetScreenBufferInfo takes a ScreenBufferInfo and sets all the
-// current window's properties to match.
-func SetScreenBufferInfo(info ScreenBufferInfo) {
-	SetCharacterProperties(info.CharacterColor)
-}
-
-// SetTitle sets the title of the console
-func SetTitle(title string) {
-	cTitle := C.CString(title)
-	defer C.free(unsafe.Pointer(cTitle))
-	C.SetConsoleTitle((*C.CHAR)(cTitle))
 }
 
 const (
@@ -227,4 +168,11 @@ const (
 	ScArrowDown  = 0x50
 	ScEsc        = 0x1B
 	ScIdentifier = 0xE0
+)
+
+const (
+	ScArrowUpPosix    = 0x41
+	ScArrowLeftPosix  = 0x44
+	ScArrowRightPosix = 0x43
+	ScArrowDownPosix  = 0x42
 )
