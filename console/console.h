@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <conio.h>
 
-const int IS_WINDOWS = 1;
+#define IS_WINDOWS 1
 void MoveTo(SHORT row, SHORT column) {
     COORD Cord;
     Cord.X = row;
@@ -47,7 +47,7 @@ int GetConAttributes(CONSOLE_SCREEN_BUFFER_INFO* infoBuffer) {
  #include <termios.h>
  #include <unistd.h>
  #include <fcntl.h>
- const int IS_WINDOWS = 0;
+ #define IS_WINDOWS 0
 
  // console properties
  struct termios initialTermios, currentTermios;
@@ -116,15 +116,15 @@ void SetCursorProperties(int visible) {
     xxxxxxxxxxxxxxxxxxxxxxx|        x|           x|           x|                 xxx|                 xxx|
           reserved (blink?)|underline|bg intensity|fg intensity|background color BGR|foreground color BGR|
 */
-const int FOREGROUND_RED = 0x00000001;
-const int FOREGROUND_GREEN = 0x00000002;
-const int FOREGROUND_BLUE = 0x00000004;
-const int BACKGROUND_RED = 0x00000008;
-const int BACKGROUND_GREEN = 0x00000010;
-const int BACKGROUND_BLUE = 0x00000020;
-const int FOREGROUND_INTENSITY = 0x00000040;
-const int BACKGROUND_INTENSITY = 0x00000080;
-const int COMMON_LVB_UNDERSCORE = 0x00000100;
+#define FOREGROUND_RED 0x00000001
+#define FOREGROUND_GREEN 0x00000002
+#define FOREGROUND_BLUE 0x00000004
+#define BACKGROUND_RED 0x00000008
+#define BACKGROUND_GREEN 0x00000010
+#define BACKGROUND_BLUE 0x00000020
+#define FOREGROUND_INTENSITY 0x00000040
+#define BACKGROUND_INTENSITY 0x00000080
+#define COMMON_LVB_UNDERSCORE 0x00000100
 
 void SetCharacterProperties(int properties) {
     int foreground = (properties & 0x00000007) + 30;
