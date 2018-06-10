@@ -7,7 +7,7 @@ import (
 
 // TextBox is a control that performs a specific action when activated.
 type TextBox struct {
-	name, text                                               string
+	name, text, label                                        string
 	x, y, layer, contentWidth                                int
 	enabledBorderColor, focusedBorderColor, enabledTextColor int
 	disabledBorderColor, disabledTextColor                   int
@@ -21,6 +21,8 @@ type TextBox struct {
 func NewTextBox(name string) *TextBox {
 	tb := new(TextBox)
 	tb.name = name
+	tb.text = ""
+	tb.label = ""
 	tb.x = 0
 	tb.y = 0
 	tb.layer = 0
@@ -42,6 +44,11 @@ func NewTextBox(name string) *TextBox {
 // SetText sets the text
 func (tb *TextBox) SetText(newText string) {
 	tb.text = newText
+}
+
+// SetLabel sets the label
+func (tb *TextBox) SetLabel(label string) {
+	tb.label = label
 }
 
 // SetX sets the x value
@@ -95,7 +102,7 @@ func (tb *TextBox) Process(frameInfo *FrameInfo) {
 				} else {
 					tb.text += string(frameInfo.KeyInfo.Char)
 					tb.draw()
-				} // TODO: backspace and arrow keys
+				} // IMPROVE: arrow keys
 			}
 		}
 	}
@@ -137,15 +144,29 @@ func (tb *TextBox) draw() {
 	cBuffer := rc.FillArrayI(rectWidth, rectHeight, borderColor)
 
 	// draw the corners of the border
-	rBuffer[0][0] = '┌'
-	rBuffer[0][rectWidth-1] = '┐'
+	borderTop := '─'
+	borderLeftCorner := '┌'
+	borderRightCorner := '┐'
+	if len(tb.label) > 0 {
+		borderTop = '═'
+		borderLeftCorner = '╒'
+		borderRightCorner = '╕'
+	}
+
+	rBuffer[0][0] = borderLeftCorner
+	rBuffer[0][rectWidth-1] = borderRightCorner
 	rBuffer[rectHeight-1][0] = '└'
 	rBuffer[rectHeight-1][rectWidth-1] = '┘'
 
 	// fill in top and bottom of the border
-	for i := 1; i < rectWidth-1; i++ {
-		rBuffer[0][i] = '─'
-		rBuffer[rectHeight-1][i] = '─'
+	lableSlice := []rune(tb.label)
+	for i := 0; i < rectWidth - 2; i++ {
+		if i < len(lableSlice) {
+			rBuffer[0][i + 1] = lableSlice[i]
+		} else {
+			rBuffer[0][i + 1] = borderTop
+		}
+		rBuffer[rectHeight-1][i + 1] = '─'
 	}
 
 	// fill in left and right border

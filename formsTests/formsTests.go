@@ -32,6 +32,13 @@ func main() {
 	textBox1.SetX(1)
 	textBox1.SetY(10)
 
+	textBox2 := forms.NewTextBox("tb2")
+	textBox2.SetText("")
+	textBox2.SetLabel("label here")
+	textBox2.SetContentWidth(20)
+	textBox2.SetX(1)
+	textBox2.SetY(15)
+
 	quit := false
 
 	quitButton := forms.NewButton("btnQuit")
@@ -47,6 +54,7 @@ func main() {
 	form.AddControl(button1, true)
 	form.AddControl(button2, true)
 	form.AddControl(textBox1, true)
+	form.AddControl(textBox2, true)
 	form.AddControl(quitButton, true)
 	form.InitiVisual()
 	form.FlagFocusNext()
