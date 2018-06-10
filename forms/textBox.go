@@ -87,7 +87,7 @@ func (tb *TextBox) Process(frameInfo *FrameInfo) {
 			if !frameInfo.KeyInfo.IsSpecial {
 				if frameInfo.KeyInfo.Char == '\t' {
 					tb.owner.FlagFocusNext()
-				} else if byte(frameInfo.KeyInfo.Char) == console.ScDelete {
+				} else if byte(frameInfo.KeyInfo.Char) == console.ScDelete || byte(frameInfo.KeyInfo.Char) == 0x08 {
 					if len(tb.text) > 0 {
 						tb.text = string([]rune(tb.text)[0:len(tb.text) - 1])
 						tb.draw()

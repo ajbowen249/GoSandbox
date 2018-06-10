@@ -4,23 +4,30 @@
 //          ideas. This will need heavy refactoring
 //          to make it all cleanly cross-platform.
 
-#ifdef __WINDOWS__
+#ifdef _WIN32
 #include <stdio.h>
 #include <windows.h>
 #include <conio.h>
 
 #define IS_WINDOWS 1
-void MoveTo(SHORT row, SHORT column) {
+
+int defaultCursorAttrs;
+CONSOLE_CURSOR_INFO defaultCursorInfo;
+
+void SetNoEcho() {
+    // not needed on Windows
+}
+
+void MoveTo(int row, int column) {
     COORD Cord;
-    Cord.X = row;
-    Cord.Y = column;
+    Cord.X = (SHORT)row;
+    Cord.Y = (SHORT)column;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Cord);
 }
 
 char GetKey() {
     char character = 0x00;
-    if(kbhit())
-    {
+    if(kbhit()) {
        character = getch();
     }
 
@@ -39,19 +46,28 @@ void SetCharacterProperties(int properties) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)properties);
 }
 
-int GetConAttributes(CONSOLE_SCREEN_BUFFER_INFO* infoBuffer) {
-    return GetConsoleAttributes(GetStdHandle(STD_OUTPUT_HANDLE), infoBuffer);
-}
- #else
- #include <stdio.h>
- #include <termios.h>
- #include <unistd.h>
- #include <fcntl.h>
- #define IS_WINDOWS 0
+void SaveInitialScreenState() {
+    CONSOLE_SCREEN_BUFFER_INFO defaultConsoleAttrs;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &defaultConsoleAttrs);
+    defaultCursorAttrs = defaultConsoleAttrs.wAttributes;
 
- // console properties
- struct termios initialTermios, currentTermios;
- int cursorDefaultVisible = 1;
+    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &defaultCursorInfo);
+}
+
+void RestoreInitialScreenState() {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)defaultCursorAttrs);
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &defaultCursorInfo);
+}
+#else
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+#define IS_WINDOWS 0
+
+// console properties
+struct termios initialTermios, currentTermios;
+int cursorDefaultVisible = 1;
 
 
 void SetNoEcho() {
