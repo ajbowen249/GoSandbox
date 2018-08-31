@@ -58,6 +58,32 @@ void RestoreInitialScreenState() {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (WORD)defaultCursorAttrs);
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &defaultCursorInfo);
 }
+
+CHAR_INFO MakeCharInfo(WCHAR character, WORD colors) {
+    CHAR_INFO info;
+    info.Char.UnicodeChar = character;
+    info.Attributes = colors;
+    return info;
+}
+
+void WriteToBuffer(SHORT width, SHORT height, CHAR_INFO* buffer) {
+    COORD size;
+    size.X = width;
+    size.Y = height;
+
+    COORD coord;
+    coord.X = 0;
+    coord.Y = 0;
+
+    SMALL_RECT rect;
+    rect.Left = 0;
+    rect.Top = 0;
+    rect.Right = 79;
+    rect.Bottom = 24;
+
+    WriteConsoleOutput(GetStdHandle(STD_OUTPUT_HANDLE), buffer, size, coord, &rect);
+}
+
 #else
 #include <stdio.h>
 #include <termios.h>

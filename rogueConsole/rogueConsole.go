@@ -1,8 +1,6 @@
 package rogueConsole
 
 import (
-	"fmt"
-
 	"github.com/ajbowen249/GoSandbox/console"
 )
 
@@ -89,11 +87,8 @@ func (con *RogueConsole) GetFrameArray() ([][]rune, [][]int) {
 
 //Draw outputs the frame buffer to the console.
 func (con *RogueConsole) Draw() {
-	con.Visit(func(r rune, i int, row int, col int) {
-		console.MoveTo(col, row)
-		console.SetCharacterProperties(i)
-		fmt.Print(string(r))
-	})
+	characters, colors := con.GetFrameArray()
+	console.WriteToBuffer(characters, colors)
 }
 
 // Visit passes each rune in the frame array through the

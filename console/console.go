@@ -124,6 +124,39 @@ func SetCharacterProperties(properties int) {
 	C.SetCharacterProperties(C.int(properties))
 }
 
+// WriteToBuffer writes the given characters and colors
+// to the console buffer.
+func WriteToBuffer(chars [][]rune, colors [][]int) {
+	if C.IS_WINDOWS == 1 {
+		height := len(chars)
+		if height == 0 {
+			return
+		}
+
+		width := len(chars[0])
+
+		charInfoBuffer := make([]C.CHAR_INFO, height*width)
+		k := 0
+		for i := 0; i < height; i++ {
+			for j := 0; j < width; j++ {
+				info := C.MakeCharInfo(C.WCHAR(chars[i][j]), C.WORD(colors[i][j]))
+				charInfoBuffer[k] = info
+				k++
+			}
+		}
+
+		C.WriteToBuffer(C.SHORT(width), C.SHORT(height), &charInfoBuffer[0])
+	} else {
+		for row := 0; row < len(chars); row++ {
+			for col := 0; col < len(chars[row]); col++ {
+				MoveTo(col, row)
+				SetCharacterProperties(colors[row][col])
+				fmt.Print(string(chars[row][col]))
+			}
+		}
+	}
+}
+
 const (
 	ChFgBlack       = 0
 	ChFgDarkBlue    = C.FOREGROUND_BLUE
